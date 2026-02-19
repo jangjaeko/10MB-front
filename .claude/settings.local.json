@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(npx tsc:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd //c \"taskkill /PID 21412 /F\")",
+      "Bash(ls -la \"C:\\\\Users\\\\tecdo\\\\Desktop\\\\10MinBreak\\\\backend\\\\src\\\\common\\\\redis\"\" 2>/dev/null || echo \"Redis directory not found \")",
+      "Bash(curl:*)",
+      "Bash(cmd //c \"taskkill /F /IM node.exe\")",
+      "Bash(npm run start:dev:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)"
+    ]
+  }
+}
