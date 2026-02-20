@@ -2,8 +2,13 @@
 'use client';
 
 import { Header } from '@/components/layout/Header';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function NotificationsPage() {
+  const { isLoading, isAuthenticated } = useAuth();
+
+  if (isLoading || !isAuthenticated) return null;
+
   return (
     <>
       <Header title="알림" />

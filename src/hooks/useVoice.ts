@@ -16,6 +16,10 @@ export const useVoice = (mode: VoiceMode = 'match') => {
   const [isConnected, setIsConnected] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  // 현재 말하고 있는 uid 목록 (볼륨 기준)
+  const [speakingUids, setSpeakingUids] = useState<Set<number>>(new Set());
+  // 내 Agora uid
+  const [myUid, setMyUid] = useState<number | null>(null);
 
   const mountedRef = useRef(true);
   const retryCountRef = useRef(0);
@@ -48,9 +52,23 @@ export const useVoice = (mode: VoiceMode = 'match') => {
         }
       });
 
+      // 5. 볼륨 인디케이터 활성화 (room 모드)
+      if (mode === 'room') {
+        agora.enableVolumeIndicator();
+        agora.onVolumeIndicator((volumes) => {
+          if (!mountedRef.current) return;
+          const speaking = new Set<number>();
+          for (const v of volumes) {
+            if (v.level > 5) speaking.add(v.uid);
+          }
+          setSpeakingUids(speaking);
+        });
+      }
+
       if (mountedRef.current) {
         setIsConnected(true);
         setIsMicOn(true);
+        setMyUid(uid);
         retryCountRef.current = 0;
         // match 모드에서만 phase 전환
         if (mode === 'match') {
@@ -143,6 +161,8 @@ export const useVoice = (mode: VoiceMode = 'match') => {
     isConnected,
     isMicOn,
     connectionError,
+    speakingUids,
+    myUid,
     join,
     leave,
     toggleMic,

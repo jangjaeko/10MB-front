@@ -13,6 +13,7 @@ import { ReportModal } from '@/components/match/ReportModal';
 import { Button } from '@/components/common/Button';
 import { useMatchStore } from '@/stores/useMatchStore';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuth } from '@/hooks/useAuth';
 import { useSocket } from '@/hooks/useSocket';
 import { useVoice } from '@/hooks/useVoice';
 import { useTimer } from '@/hooks/useTimer';
@@ -24,6 +25,7 @@ const MATCH_FOUND_DELAY = 2000;
 
 export default function MatchPage() {
   const router = useRouter();
+  const { isLoading, isAuthenticated } = useAuth();
   const { user } = useAuthStore();
   const {
     phase,
@@ -54,6 +56,11 @@ export default function MatchPage() {
   const [showReportModal, setShowReportModal] = useState(false);
   // 매칭 타임아웃 (60초)
   const [searchTimedOut, setSearchTimedOut] = useState(false);
+
+  // 로딩 중이거나 비인증 상태면 빈 화면 (useAuth에서 리다이렉트 처리)
+  if (isLoading || !isAuthenticated) {
+    return null;
+  }
 
   // 매칭 성공 → 일정 시간 후 active 전환 (useVoice가 agoraChannelId 감지해 자동 입장)
   useEffect(() => {

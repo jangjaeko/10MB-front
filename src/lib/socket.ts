@@ -20,6 +20,13 @@ export interface ServerToClientEvents {
   'match:timer_end': () => void;
   'match:partner_left': () => void;
   'match:error': (data: { message: string }) => void;
+  'room:update': (data: { roomId: string; currentParticipants: number }) => void;
+  'room:joined': (data: { roomId: string }) => void;
+  'room:left': (data: { roomId: string }) => void;
+  'room:error': (data: { message: string }) => void;
+  'room:participants': (data: { roomId: string; participants: { userId: string; nickname: string; interests: string[] }[] }) => void;
+  'room:user_joined': (data: { roomId: string; user: { userId: string; nickname: string } }) => void;
+  'room:user_left': (data: { roomId: string; user: { userId: string; nickname: string } }) => void;
 }
 
 // 클라이언트→서버 이벤트 타입
@@ -28,6 +35,8 @@ export interface ClientToServerEvents {
   'match:cancel': () => void;
   'match:leave': () => void;
   'user:online': () => void;
+  'room:join': (data: { roomId: string }) => void;
+  'room:leave': (data: { roomId: string }) => void;
 }
 
 // 타입이 지정된 소켓 타입

@@ -101,6 +101,16 @@ export const useAuth = () => {
     router.push('/auth/login');
   }, [router, storeLogout]);
 
+  // 비로그인 시 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      const path = window.location.pathname;
+      if (!path.startsWith('/auth/') && path !== '/onboarding') {
+        router.push('/auth/login');
+      }
+    }
+  }, [isLoading, isAuthenticated, router]);
+
   // 온보딩 미완료 시 리다이렉트 (로그인 되어 있지만 닉네임 미설정)
   useEffect(() => {
     if (!isLoading && isAuthenticated && !isOnboarded) {

@@ -11,9 +11,11 @@ import { api } from '@/lib/api';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
-  const { signOut } = useAuth();
+  const { isLoading, isAuthenticated, signOut } = useAuth();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  if (isLoading || !isAuthenticated) return null;
 
   // 계정 삭제 처리
   const handleDeleteAccount = async () => {

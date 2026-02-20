@@ -106,5 +106,26 @@ export const onUserLeft = (
   };
 };
 
+// 볼륨 인디케이터 활성화 (말하는 사람 감지)
+export const enableVolumeIndicator = (): void => {
+  if (client) {
+    client.enableAudioVolumeIndicator();
+  }
+};
+
+// 볼륨 인디케이터 이벤트 리스너
+export const onVolumeIndicator = (
+  callback: (volumes: { uid: number; level: number }[]) => void,
+): (() => void) => {
+  if (!client) return () => {};
+  const handler = (result: { uid: number; level: number }[]) => {
+    callback(result);
+  };
+  client.on('volume-indicator', handler);
+  return () => {
+    client?.off('volume-indicator', handler);
+  };
+};
+
 // 클라이언트 참조 반환 (상태 확인용)
 export const getClient = () => client;
