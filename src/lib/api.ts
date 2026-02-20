@@ -138,6 +138,23 @@ class ApiClient {
     });
   }
 
+  // --- Rooms ---
+
+  // 대화방 목록 조회
+  async getRooms() {
+    return this.request('/api/rooms');
+  }
+
+  // 대화방 입장
+  async joinRoom(roomId: string) {
+    return this.request(`/api/rooms/${roomId}/join`, { method: 'POST' });
+  }
+
+  // 대화방 퇴장
+  async leaveRoom(roomId: string) {
+    return this.request(`/api/rooms/${roomId}/leave`, { method: 'POST' });
+  }
+
   // --- Reports ---
 
   // 유저 신고

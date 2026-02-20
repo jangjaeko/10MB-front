@@ -1,4 +1,4 @@
-// Agora 음성 통화 관리 훅 (토큰 발급 → 채널 입장 → 마이크 → 퇴장)
+// Agora 음성 통화 관리 훅 (match: 1:1 매칭, room: 그룹 대화방)
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -8,8 +8,10 @@ import { api } from '@/lib/api';
 // 최대 재시도 횟수
 const MAX_RETRIES = 3;
 
-export const useVoice = () => {
-  const { agoraChannelId, isMuted, setMuted, setPhase } = useMatchStore();
+type VoiceMode = 'match' | 'room';
+
+export const useVoice = (mode: VoiceMode = 'match') => {
+  const { agoraChannelId, setMuted, setPhase } = useMatchStore();
 
   const [isConnected, setIsConnected] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
@@ -49,8 +51,11 @@ export const useVoice = () => {
       if (mountedRef.current) {
         setIsConnected(true);
         setIsMicOn(true);
-        setPhase('active');
         retryCountRef.current = 0;
+        // match 모드에서만 phase 전환
+        if (mode === 'match') {
+          setPhase('active');
+        }
       }
     } catch (err) {
       console.error('[10MB] 음성 연결 실패:', err);
@@ -68,12 +73,10 @@ export const useVoice = () => {
 
       // 재시도 초과
       if (mountedRef.current) {
-        setConnectionError(
-          getErrorMessage(err),
-        );
+        setConnectionError(getErrorMessage(err));
       }
     }
-  }, [setPhase]);
+  }, [mode, setPhase]);
 
   // 채널 퇴장 + 리소스 정리
   const leave = useCallback(async () => {
@@ -94,14 +97,18 @@ export const useVoice = () => {
       const newState = !isMicOn;
       agora.setMicEnabled(newState);
       setIsMicOn(newState);
-      setMuted(!newState);
+      if (mode === 'match') {
+        setMuted(!newState);
+      }
     } catch (err) {
       console.error('[10MB] 마이크 토글 에러:', err);
     }
-  }, [isMicOn, setMuted]);
+  }, [isMicOn, mode, setMuted]);
 
-  // agoraChannelId가 설정되면 자동 입장
+  // match 모드: agoraChannelId가 설정되면 자동 입장
   useEffect(() => {
+    if (mode !== 'match') return;
+
     mountedRef.current = true;
 
     if (agoraChannelId) {
@@ -110,13 +117,27 @@ export const useVoice = () => {
 
     return () => {
       mountedRef.current = false;
-      // 언마운트 시 채널 퇴장
       import('@/lib/agora').then((agora) => {
         agora.leaveChannel().catch(() => {});
       });
       setIsConnected(false);
     };
-  }, [agoraChannelId, join]);
+  }, [mode, agoraChannelId, join]);
+
+  // room 모드: 언마운트 시 정리만
+  useEffect(() => {
+    if (mode !== 'room') return;
+
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      import('@/lib/agora').then((agora) => {
+        agora.leaveChannel().catch(() => {});
+      });
+      setIsConnected(false);
+    };
+  }, [mode]);
 
   return {
     isConnected,

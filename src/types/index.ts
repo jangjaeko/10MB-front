@@ -53,6 +53,25 @@ export interface Report {
   created_at: string;
 }
 
+// Room types
+export interface Room {
+  id: string;
+  name: string;
+  theme: string;
+  icon: string;
+  max_participants: number;
+  current_participants: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface RoomParticipant {
+  id: string;
+  room_id: string;
+  user_id: string;
+  joined_at: string;
+}
+
 // Interest tags
 export const INTEREST_TAGS = [
   '잡담',
