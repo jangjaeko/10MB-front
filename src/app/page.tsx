@@ -43,11 +43,6 @@ export default function HomePage() {
 
   const { isConnected, isMicOn, connectionError, speakingUids, myUid, join, leave, toggleMic } = useVoice('room');
 
-  // 로딩 중이거나 비인증 상태면 빈 화면 (useAuth에서 리다이렉트 처리)
-  if (isLoading || !isAuthenticated) {
-    return null;
-  }
-
   // Agora speakingUids → userId 변환
   useEffect(() => {
     if (participants.length === 0 || speakingUids.size === 0) {
@@ -146,6 +141,11 @@ export default function HomePage() {
       socket.off('room:user_left', handleUserLeft);
     };
   }, [accessToken, user?.id]);
+
+  // 로딩 중이거나 비인증 상태면 빈 화면 (useAuth에서 리다이렉트 처리)
+  if (isLoading || !isAuthenticated) {
+    return null;
+  }
 
   // 대화방 입장 핸들러
   const handleJoinRoom = async (roomId: string) => {

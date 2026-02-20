@@ -57,11 +57,6 @@ export default function MatchPage() {
   // 매칭 타임아웃 (60초)
   const [searchTimedOut, setSearchTimedOut] = useState(false);
 
-  // 로딩 중이거나 비인증 상태면 빈 화면 (useAuth에서 리다이렉트 처리)
-  if (isLoading || !isAuthenticated) {
-    return null;
-  }
-
   // 매칭 성공 → 일정 시간 후 active 전환 (useVoice가 agoraChannelId 감지해 자동 입장)
   useEffect(() => {
     if (phase !== 'matched') return;
@@ -105,6 +100,11 @@ export default function MatchPage() {
     }, 60000);
     return () => clearTimeout(timer);
   }, [phase]);
+
+  // 로딩 중이거나 비인증 상태면 빈 화면 (useAuth에서 리다이렉트 처리)
+  if (isLoading || !isAuthenticated) {
+    return null;
+  }
 
   // 매칭 시작 핸들러
   const handleStartMatch = () => {
