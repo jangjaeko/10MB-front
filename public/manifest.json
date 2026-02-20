@@ -4,19 +4,7 @@
   "description": "쉬는 시간 10분 동안 낯선 사람과 음성으로 가볍게 소통하는 플랫폼",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+  "background_color": "#030712",
+  "theme_color": "#f97316",
+  "orientation": "portrait"
 }
