@@ -12,7 +12,8 @@
       "Bash(cmd //c \"taskkill /F /IM node.exe\")",
       "Bash(npm run start:dev:*)",
       "Bash(npm install:*)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

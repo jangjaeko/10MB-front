@@ -1,0 +1,17 @@
+// 알림 페이지 (v2 후반에 구현 예정)
+'use client';
+
+import { Header } from '@/components/layout/Header';
+
+export default function NotificationsPage() {
+  return (
+    <>
+      <Header title="알림" />
+      <div className="pt-16 pb-20 flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <span className="text-5xl mb-4">🚧</span>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">준비 중이에요</h2>
+        <p className="text-gray-500 text-sm">곧 만나요!</p>
+      </div>
+    </>
+  );
+}
