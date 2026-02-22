@@ -110,3 +110,43 @@ export interface MatchFoundEvent {
 export interface TimerSyncEvent {
   remainingSeconds: number;
 }
+
+// Community types
+export type PostCategory = 'free' | 'concern' | 'humor' | 'topic' | 'review';
+
+export const POST_CATEGORIES: { value: PostCategory; label: string }[] = [
+  { value: 'free', label: '자유' },
+  { value: 'concern', label: '고민' },
+  { value: 'humor', label: '유머' },
+  { value: 'topic', label: '대화주제추천' },
+  { value: 'review', label: '대화후기' },
+];
+
+export interface Post {
+  id: string;
+  user_id: string;
+  category: PostCategory;
+  title: string;
+  content: string;
+  like_count: number;
+  comment_count: number;
+  authorNickname: string;
+  isLiked?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Comment {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  authorNickname: string;
+  created_at: string;
+}
+
+export interface PostListResponse {
+  posts: Post[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}

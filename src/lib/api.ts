@@ -169,6 +169,62 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  // --- Community ---
+
+  // 게시글 목록 조회
+  async getPosts(params?: { category?: string; cursor?: string; limit?: number }) {
+    const query = new URLSearchParams();
+    if (params?.category) query.set('category', params.category);
+    if (params?.cursor) query.set('cursor', params.cursor);
+    if (params?.limit) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    return this.request(`/api/posts${qs ? `?${qs}` : ''}`);
+  }
+
+  // 게시글 상세 조회
+  async getPost(postId: string) {
+    return this.request(`/api/posts/${postId}`);
+  }
+
+  // 게시글 작성
+  async createPost(data: { category: string; title: string; content: string }) {
+    return this.request('/api/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // 게시글 수정
+  async updatePost(postId: string, data: { title?: string; content?: string }) {
+    return this.request(`/api/posts/${postId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // 게시글 삭제
+  async deletePost(postId: string) {
+    return this.request(`/api/posts/${postId}`, { method: 'DELETE' });
+  }
+
+  // 댓글 작성
+  async createComment(postId: string, content: string) {
+    return this.request(`/api/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  // 댓글 삭제
+  async deleteComment(commentId: string) {
+    return this.request(`/api/posts/comments/${commentId}`, { method: 'DELETE' });
+  }
+
+  // 좋아요 토글
+  async toggleLike(postId: string) {
+    return this.request(`/api/posts/${postId}/like`, { method: 'POST' });
+  }
 }
 
 export const api = new ApiClient(API_URL);
