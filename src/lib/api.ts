@@ -217,8 +217,8 @@ class ApiClient {
   }
 
   // 댓글 삭제
-  async deleteComment(commentId: string) {
-    return this.request(`/api/posts/comments/${commentId}`, { method: 'DELETE' });
+  async deleteComment(postId: string, commentId: string) {
+    return this.request(`/api/posts/${postId}/comments/${commentId}`, { method: 'DELETE' });
   }
 
   // 좋아요 토글
