@@ -1,11 +1,13 @@
-// 게시글 상세 페이지 (내용 + 댓글 + 좋아요)
+// 게시글 상세 페이지 (내용 + 댓글 + 좋아요 + ⋯ 메뉴)
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@/lib/api';
+import { CommentSection } from '@/components/community/CommentSection';
+import { ConfirmModal } from '@/components/community/ConfirmModal';
 import type { Post, Comment, PostCategory } from '@/types';
 
 const CATEGORY_LABEL: Record<PostCategory, string> = {
@@ -16,6 +18,7 @@ const CATEGORY_LABEL: Record<PostCategory, string> = {
   review: '대화후기',
 };
 
+// 상대 시간 표시
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60000);
@@ -38,10 +41,16 @@ export default function PostDetailPage() {
 
   const [post, setPost] = useState<(Post & { comments: Comment[] }) | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+
+  // ⋯ 메뉴 상태
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // 삭제 확인 모달 상태
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // 게시글 조회
   useEffect(() => {
@@ -63,6 +72,19 @@ export default function PostDetailPage() {
     fetchPost();
   }, [isAuthenticated, postId, router]);
 
+  // 메뉴 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
+
   // 좋아요 토글
   const handleLike = async () => {
     setIsLiked((prev) => !prev);
@@ -79,13 +101,10 @@ export default function PostDetailPage() {
   };
 
   // 댓글 작성
-  const handleComment = async () => {
-    if (!commentText.trim() || isSubmitting) return;
+  const handleAddComment = async (content: string) => {
     setIsSubmitting(true);
-
     try {
-      const newComment = await api.createComment(postId, commentText.trim()) as Comment;
-      // 닉네임 붙여서 추가
+      const newComment = await api.createComment(postId, content) as Comment;
       setPost((prev) =>
         prev
           ? {
@@ -95,7 +114,6 @@ export default function PostDetailPage() {
             }
           : prev,
       );
-      setCommentText('');
     } catch (err) {
       console.error('[10MB] 댓글 작성 실패:', err);
     } finally {
@@ -123,6 +141,7 @@ export default function PostDetailPage() {
 
   // 게시글 삭제
   const handleDeletePost = async () => {
+    setShowDeleteConfirm(false);
     try {
       await api.deletePost(postId);
       router.push('/community');
@@ -149,6 +168,7 @@ export default function PostDetailPage() {
     <div className="min-h-screen bg-gray-950 pb-20">
       {/* 헤더 */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+        {/* 뒤로가기 */}
         <button
           onClick={() => router.back()}
           className="text-gray-400 hover:text-white transition-colors"
@@ -157,21 +177,56 @@ export default function PostDetailPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
+
         <h1 className="text-sm font-semibold text-white">게시글</h1>
+
+        {/* 본인 글: ⋯ 메뉴 */}
         {isAuthor ? (
-          <button
-            onClick={handleDeletePost}
-            className="text-xs text-red-400 hover:text-red-300"
-          >
-            삭제
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setShowMenu((prev) => !prev)}
+              className="text-gray-400 hover:text-white transition-colors p-1"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="5" r="1.5" />
+                <circle cx="12" cy="12" r="1.5" />
+                <circle cx="12" cy="19" r="1.5" />
+              </svg>
+            </button>
+
+            {/* 드롭다운 메뉴 */}
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-gray-800 rounded-lg border border-gray-700 overflow-hidden shadow-lg z-50 min-w-[100px]">
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    router.push(`/community/write?edit=${postId}`);
+                  }}
+                  className="w-full px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-700 text-left transition-colors"
+                >
+                  수정
+                </button>
+                <div className="h-px bg-gray-700" />
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    setShowDeleteConfirm(true);
+                  }}
+                  className="w-full px-4 py-2.5 text-sm text-red-400 hover:bg-gray-700 text-left transition-colors"
+                >
+                  삭제
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
-          <div className="w-6" />
+          <div className="w-7" />
         )}
       </div>
 
       {/* 게시글 내용 */}
       <div className="px-4 py-4 border-b border-gray-800">
+        {/* 작성자 정보 */}
         <div className="flex items-center gap-2 mb-3">
           <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center">
             <span className="text-sm font-bold text-gray-300">
@@ -189,6 +244,7 @@ export default function PostDetailPage() {
           </div>
         </div>
 
+        {/* 제목 + 내용 */}
         <h2 className="text-base font-bold text-white mb-2">{post.title}</h2>
         <p className="text-sm text-gray-300 whitespace-pre-wrap break-words">{post.content}</p>
 
@@ -218,62 +274,23 @@ export default function PostDetailPage() {
         </div>
       </div>
 
-      {/* 댓글 목록 */}
-      <div>
-        {post.comments?.map((comment) => (
-          <div key={comment.id} className="px-4 py-3 border-b border-gray-800/50">
-            <div className="flex items-start gap-2">
-              <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-xs font-bold text-gray-300">
-                  {comment.authorNickname?.charAt(0) ?? '?'}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-white">{comment.authorNickname}</span>
-                    <span className="text-[10px] text-gray-500">{timeAgo(comment.created_at)}</span>
-                  </div>
-                  {comment.user_id === user?.id && (
-                    <button
-                      onClick={() => handleDeleteComment(comment.id)}
-                      className="text-[10px] text-gray-600 hover:text-red-400"
-                    >
-                      삭제
-                    </button>
-                  )}
-                </div>
-                <p className="text-sm text-gray-300 mt-0.5 break-words">{comment.content}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* 댓글 섹션 */}
+      <CommentSection
+        comments={post.comments ?? []}
+        currentUserId={user?.id}
+        isSubmitting={isSubmitting}
+        onSubmit={handleAddComment}
+        onDelete={handleDeleteComment}
+      />
 
-      {/* 댓글 입력 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 px-4 py-3 z-50">
-        <div className="max-w-md mx-auto flex gap-2">
-          <input
-            type="text"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleComment()}
-            placeholder="댓글을 입력해주세요"
-            className="flex-1 bg-gray-800 text-white text-sm rounded-full px-4 py-2.5 outline-none placeholder:text-gray-500"
-          />
-          <button
-            onClick={handleComment}
-            disabled={!commentText.trim() || isSubmitting}
-            className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
-              commentText.trim()
-                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                : 'bg-gray-800 text-gray-600'
-            }`}
-          >
-            전송
-          </button>
-        </div>
-      </div>
+      {/* 게시글 삭제 확인 모달 */}
+      {showDeleteConfirm && (
+        <ConfirmModal
+          message="게시글을 삭제하시겠어요?"
+          onConfirm={handleDeletePost}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
     </div>
   );
 }
