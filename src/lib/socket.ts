@@ -19,6 +19,9 @@ export interface ServerToClientEvents {
   'match:timer_warning': () => void;
   'match:timer_end': () => void;
   'match:partner_left': () => void;
+  'match:extend_request': (data: Record<string, never>) => void;
+  'match:extend_approved': (data: { addedSeconds: number; newRemaining: number }) => void;
+  'match:extend_rejected': (data: Record<string, never>) => void;
   'match:error': (data: { message: string }) => void;
   'room:update': (data: { roomId: string; currentParticipants: number }) => void;
   'room:joined': (data: { roomId: string }) => void;
@@ -34,6 +37,8 @@ export interface ClientToServerEvents {
   'match:start': (data: { interests: string[] }) => void;
   'match:cancel': () => void;
   'match:leave': () => void;
+  'match:extend_request': () => void;
+  'match:extend_response': (data: { accept: boolean }) => void;
   'user:online': () => void;
   'room:join': (data: { roomId: string }) => void;
   'room:leave': (data: { roomId: string }) => void;

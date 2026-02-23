@@ -4,6 +4,7 @@ import type { MatchStatus, MatchFoundEvent } from '@/types';
 
 type MatchPhase = 'idle' | 'selecting' | 'searching' | 'matched' | 'active' | 'ended';
 type EndReason = 'timer' | 'partner_left' | 'self_left' | null;
+type ExtendStatus = 'none' | 'requested' | 'received' | 'approved' | 'rejected';
 
 interface MatchState {
   phase: MatchPhase;
@@ -19,6 +20,9 @@ interface MatchState {
   isMuted: boolean;
   waitingCount: number;
   searchStartTime: number | null;
+  extendStatus: ExtendStatus;
+  isExtended: boolean;
+  totalSeconds: number;
 
   // Actions
   setPhase: (phase: MatchPhase) => void;
@@ -29,6 +33,9 @@ interface MatchState {
   setWaitingCount: (count: number) => void;
   setEnded: (reason: EndReason) => void;
   startSearching: () => void;
+  setExtendStatus: (status: ExtendStatus) => void;
+  setExtended: () => void;
+  setTotalSeconds: (seconds: number) => void;
   reset: () => void;
 }
 
@@ -46,6 +53,9 @@ const initialState = {
   isMuted: false,
   waitingCount: 0,
   searchStartTime: null,
+  extendStatus: 'none' as ExtendStatus,
+  isExtended: false,
+  totalSeconds: 600,
 };
 
 export const useMatchStore = create<MatchState>((set) => ({
@@ -65,6 +75,9 @@ export const useMatchStore = create<MatchState>((set) => ({
       agoraChannelId: data.agoraChannelId,
       agoraToken: data.agoraToken,
       remainingSeconds: 600,
+      totalSeconds: 600,
+      extendStatus: 'none',
+      isExtended: false,
     }),
 
   setRemainingSeconds: (seconds) => set({ remainingSeconds: seconds }),
@@ -81,6 +94,12 @@ export const useMatchStore = create<MatchState>((set) => ({
       phase: 'searching',
       searchStartTime: Date.now(),
     }),
+
+  setExtendStatus: (status) => set({ extendStatus: status }),
+
+  setExtended: () => set({ isExtended: true }),
+
+  setTotalSeconds: (seconds) => set({ totalSeconds: seconds }),
 
   reset: () => set(initialState),
 }));

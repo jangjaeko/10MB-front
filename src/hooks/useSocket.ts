@@ -14,6 +14,9 @@ export const useSocket = () => {
     setRemainingSeconds,
     setWaitingCount,
     setEnded,
+    setExtendStatus,
+    setExtended,
+    setTotalSeconds,
     reset,
   } = useMatchStore();
 
@@ -81,6 +84,26 @@ export const useSocket = () => {
       setEnded('partner_left');
     });
 
+    // 연장 요청 수신 (상대방이 요청)
+    socket.on('match:extend_request', () => {
+      setExtendStatus('received');
+    });
+
+    // 연장 승인 (양쪽 동의)
+    socket.on('match:extend_approved', (data) => {
+      setExtendStatus('approved');
+      setExtended();
+      setRemainingSeconds(data.newRemaining);
+      const store = useMatchStore.getState();
+      setTotalSeconds(store.totalSeconds + data.addedSeconds);
+    });
+
+    // 연장 거절
+    socket.on('match:extend_rejected', () => {
+      setExtendStatus('rejected');
+      setExtended();
+    });
+
     // 서버 에러
     socket.on('match:error', (data) => {
       setError(data.message);
@@ -92,7 +115,7 @@ export const useSocket = () => {
       socketRef.current = null;
       setIsConnected(false);
     };
-  }, [accessToken, setMatchFound, setRemainingSeconds, setWaitingCount, setEnded, reset]);
+  }, [accessToken, setMatchFound, setRemainingSeconds, setWaitingCount, setEnded, setExtendStatus, setExtended, setTotalSeconds, reset]);
 
   // 매칭 시작 emit
   const startMatch = useCallback((interests: string[]) => {
@@ -109,6 +132,20 @@ export const useSocket = () => {
     socketRef.current?.emit('match:leave');
   }, []);
 
+  // 연장 요청 emit
+  const requestExtend = useCallback(() => {
+    socketRef.current?.emit('match:extend_request');
+    setExtendStatus('requested');
+  }, [setExtendStatus]);
+
+  // 연장 응답 emit
+  const respondExtend = useCallback((accept: boolean) => {
+    socketRef.current?.emit('match:extend_response', { accept });
+    if (!accept) {
+      setExtendStatus('none');
+    }
+  }, [setExtendStatus]);
+
   return {
     socket: socketRef.current,
     isConnected,
@@ -116,5 +153,7 @@ export const useSocket = () => {
     startMatch,
     cancelMatch,
     leaveMatch,
+    requestExtend,
+    respondExtend,
   };
 };

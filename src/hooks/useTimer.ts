@@ -4,13 +4,12 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useMatchStore } from '@/stores/useMatchStore';
 
-// 타이머 기준값
-const TOTAL_SECONDS = 600;     // 10분
+// 타이머 경고 기준값
 const WARNING_SECONDS = 120;   // 2분 경고
 const URGENT_SECONDS = 30;     // 30초 긴급
 
 export const useTimer = () => {
-  const { remainingSeconds, phase } = useMatchStore();
+  const { remainingSeconds, phase, totalSeconds } = useMatchStore();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // 로컬 보간 타이머 (서버 이벤트 사이 매초 UI 업데이트)
@@ -42,7 +41,7 @@ export const useTimer = () => {
   }, [phase]);
 
   // 프로그레스 비율 (0~100)
-  const progress = (remainingSeconds / TOTAL_SECONDS) * 100;
+  const progress = (remainingSeconds / totalSeconds) * 100;
 
   // 경고 상태 (2분 이하 ~ 30초 초과)
   const isWarning = remainingSeconds <= WARNING_SECONDS && remainingSeconds > URGENT_SECONDS;

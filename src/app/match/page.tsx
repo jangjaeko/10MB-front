@@ -37,12 +37,14 @@ export default function MatchPage() {
     commonInterests,
     waitingCount,
     searchStartTime,
+    extendStatus,
+    isExtended,
     setSelectedInterests,
     setEnded,
     startSearching,
     reset,
   } = useMatchStore();
-  const { startMatch, cancelMatch, leaveMatch } = useSocket();
+  const { startMatch, cancelMatch, leaveMatch, requestExtend, respondExtend } = useSocket();
   const { isConnected, isMicOn, connectionError, leave, toggleMic } = useVoice();
   const { remainingSeconds, formattedTime, progress, isWarning, isUrgent } = useTimer();
 
@@ -272,6 +274,10 @@ export default function MatchPage() {
             isWarning={isWarning}
             isUrgent={isUrgent}
             remainingSeconds={remainingSeconds}
+            extendStatus={extendStatus}
+            isExtended={isExtended}
+            onRequestExtend={requestExtend}
+            onRespondExtend={respondExtend}
             onToggleMic={toggleMic}
             onLeave={handleLeave}
             onReport={() => setShowReportModal(true)}

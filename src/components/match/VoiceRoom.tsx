@@ -3,6 +3,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Timer } from './Timer';
+import { ExtendRequestModal } from './ExtendRequestModal';
+
+type ExtendStatus = 'none' | 'requested' | 'received' | 'approved' | 'rejected';
 
 interface VoiceRoomProps {
   partner: {
@@ -19,6 +22,11 @@ interface VoiceRoomProps {
   isWarning: boolean;
   isUrgent: boolean;
   remainingSeconds: number;
+  // 연장 관련
+  extendStatus: ExtendStatus;
+  isExtended: boolean;
+  onRequestExtend: () => void;
+  onRespondExtend: (accept: boolean) => void;
   // 핸들러
   onToggleMic: () => void;
   onLeave: () => void;
@@ -36,6 +44,10 @@ export const VoiceRoom = ({
   isWarning,
   isUrgent,
   remainingSeconds,
+  extendStatus,
+  isExtended,
+  onRequestExtend,
+  onRespondExtend,
   onToggleMic,
   onLeave,
   onReport,
@@ -45,6 +57,8 @@ export const VoiceRoom = ({
   // 30초 토스트
   const [showToast, setShowToast] = useState(false);
   const toastShownRef = useRef(false);
+  // 연장 토스트
+  const [showExtendToast, setShowExtendToast] = useState<string | null>(null);
 
   // 30초 남았을 때 토스트 표시 (1회만)
   useEffect(() => {
@@ -55,6 +69,23 @@ export const VoiceRoom = ({
       return () => clearTimeout(timer);
     }
   }, [remainingSeconds]);
+
+  // 연장 승인/거절 토스트
+  useEffect(() => {
+    if (extendStatus === 'approved') {
+      setShowExtendToast('5분 연장되었어요! 🎉');
+      const timer = setTimeout(() => setShowExtendToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+    if (extendStatus === 'rejected') {
+      setShowExtendToast('아쉽지만 다음에 또 만나요');
+      const timer = setTimeout(() => setShowExtendToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [extendStatus]);
+
+  // 연장 버튼 표시 조건: 2분 이하 + 아직 연장 안 함 + 요청/수신 중이 아닌 상태
+  const showExtendButton = remainingSeconds <= 120 && !isExtended && extendStatus === 'none';
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-3.5rem)] bg-gray-950 px-4 py-6 relative">
@@ -143,6 +174,18 @@ export const VoiceRoom = ({
         </div>
       </div>
 
+      {/* 연장 요청 버튼 (2분 이하일 때만, 1회 사용 후 숨김) */}
+      {showExtendButton && (
+        <div className="flex justify-center pb-2">
+          <button
+            onClick={onRequestExtend}
+            className="px-5 py-2.5 rounded-full bg-orange-500/15 text-orange-400 text-sm font-medium hover:bg-orange-500/25 transition-colors ring-1 ring-orange-500/30"
+          >
+            5분 더 얘기하기 ⏰
+          </button>
+        </div>
+      )}
+
       {/* 하단 컨트롤 버튼 */}
       <div className="flex items-center justify-center gap-10 py-8">
         {/* 마이크 토글 (큰 원형) */}
@@ -216,6 +259,26 @@ export const VoiceRoom = ({
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce">
           <div className="bg-red-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-red-600/30">
             곧 대화가 종료됩니다
+          </div>
+        </div>
+      )}
+
+      {/* 연장 요청/수신 모달 */}
+      <ExtendRequestModal
+        extendStatus={extendStatus}
+        partnerNickname={partner.nickname}
+        onRespond={onRespondExtend}
+      />
+
+      {/* 연장 결과 토스트 */}
+      {showExtendToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
+          <div className={`text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg ${
+            extendStatus === 'approved'
+              ? 'bg-orange-500 shadow-orange-500/30'
+              : 'bg-gray-700 shadow-gray-700/30'
+          }`}>
+            {showExtendToast}
           </div>
         </div>
       )}
