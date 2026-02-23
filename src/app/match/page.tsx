@@ -44,7 +44,7 @@ export default function MatchPage() {
     startSearching,
     reset,
   } = useMatchStore();
-  const { startMatch, cancelMatch, leaveMatch, requestExtend, respondExtend } = useSocket();
+  const { startMatch, cancelMatch, leaveMatch, requestExtend, respondExtend, pingOnline, isReconnecting, error: socketError } = useSocket();
   const { isConnected, isMicOn, connectionError, leave, toggleMic } = useVoice();
   const { remainingSeconds, formattedTime, progress, isWarning, isUrgent } = useTimer();
 
@@ -90,6 +90,17 @@ export default function MatchPage() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
+
+  // 브라우저 탭 전환/백그라운드 처리 (Page Visibility API)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        pingOnline();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [pingOnline]);
 
   // 매칭 타임아웃 (60초 경과 시 안내)
   useEffect(() => {
@@ -262,6 +273,22 @@ export default function MatchPage() {
     return (
       <>
         <Header title="대화 중" />
+
+        {/* 소켓 재연결 중 배너 */}
+        {isReconnecting && (
+          <div className="fixed top-14 left-0 right-0 z-50 flex items-center justify-center gap-2 bg-yellow-500/90 py-2 text-sm font-medium text-gray-900">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-gray-900" />
+            서버 재연결 중...
+          </div>
+        )}
+
+        {/* 소켓 연결 실패 배너 */}
+        {socketError && !isReconnecting && (
+          <div className="fixed top-14 left-0 right-0 z-50 flex items-center justify-center gap-2 bg-red-600/90 py-2 text-sm font-medium text-white">
+            {socketError}
+          </div>
+        )}
+
         <div className="pt-14">
           <VoiceRoom
             partner={partner}

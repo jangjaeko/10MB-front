@@ -24,6 +24,9 @@ export const useSocket = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+    // 재연결 중 상태
+  const [isReconnecting, setIsReconnecting] = useState(false);
+
   // 소켓 연결 및 이벤트 리스너 등록
   useEffect(() => {
     if (!accessToken) return;
@@ -34,6 +37,7 @@ export const useSocket = () => {
     // 연결 성공
     socket.on('connect', () => {
       setIsConnected(true);
+      setIsReconnecting(false);
       setError(null);
       socket.emit('user:online');
     });
@@ -42,6 +46,23 @@ export const useSocket = () => {
     socket.on('disconnect', () => {
       setIsConnected(false);
     });
+
+    // 재연결 이벤트는 Manager 레벨에서 처리
+    const manager = socket.io;
+    const onReconnectAttempt = () => setIsReconnecting(true);
+    const onReconnect = () => {
+      setIsReconnecting(false);
+      setIsConnected(true);
+      setError(null);
+      socket.emit('user:online');
+    };
+    const onReconnectFailed = () => {
+      setIsReconnecting(false);
+      setError('서버 연결이 끊겼습니다. 페이지를 새로고침해주세요.');
+    };
+    manager.on('reconnect_attempt', onReconnectAttempt);
+    manager.on('reconnect', onReconnect);
+    manager.on('reconnect_failed', onReconnectFailed);
 
     // 연결 에러
     socket.on('connect_error', (err) => {
@@ -104,13 +125,19 @@ export const useSocket = () => {
       setExtended();
     });
 
-    // 서버 에러
+    // 서버 에러 (활성 통화 중에는 리셋하지 않음)
     socket.on('match:error', (data) => {
       setError(data.message);
-      reset();
+      const { phase } = useMatchStore.getState();
+      if (phase !== 'active' && phase !== 'matched') {
+        reset();
+      }
     });
 
     return () => {
+      manager.off('reconnect_attempt', onReconnectAttempt);
+      manager.off('reconnect', onReconnect);
+      manager.off('reconnect_failed', onReconnectFailed);
       disconnectSocket();
       socketRef.current = null;
       setIsConnected(false);
@@ -146,14 +173,21 @@ export const useSocket = () => {
     }
   }, [setExtendStatus]);
 
+  // 온라인 상태 재등록 (탭 전환/백그라운드 복귀 시 사용)
+  const pingOnline = useCallback(() => {
+    socketRef.current?.emit('user:online');
+  }, []);
+
   return {
     socket: socketRef.current,
     isConnected,
+    isReconnecting,
     error,
     startMatch,
     cancelMatch,
     leaveMatch,
     requestExtend,
     respondExtend,
+    pingOnline,
   };
 };
