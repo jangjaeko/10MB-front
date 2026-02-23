@@ -29,10 +29,12 @@ export default function CommunityPage() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const observerRef = useRef<HTMLDivElement | null>(null);
+  const isFetchingRef = useRef(false);
 
-  // 게시글 조회
+  // 게시글 조회 (isFetching을 ref로 관리하여 useCallback 재생성 방지)
   const fetchPosts = useCallback(async (cursor?: string | null, reset = false) => {
-    if (isFetching) return;
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
     setIsFetching(true);
 
     try {
@@ -48,10 +50,11 @@ export default function CommunityPage() {
     } catch (err) {
       console.error('[10MB] 게시글 조회 실패:', err);
     } finally {
+      isFetchingRef.current = false;
       setIsFetching(false);
       setIsInitialLoad(false);
     }
-  }, [category, isFetching]);
+  }, [category]);
 
   // 초기 로드 + 카테고리 변경 시
   useEffect(() => {
@@ -61,7 +64,7 @@ export default function CommunityPage() {
     setHasMore(true);
     setIsInitialLoad(true);
     fetchPosts(null, true);
-  }, [isAuthenticated, category]);
+  }, [isAuthenticated, category, fetchPosts]);
 
   // 무한 스크롤 (IntersectionObserver)
   useEffect(() => {
@@ -69,7 +72,7 @@ export default function CommunityPage() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetching) {
+        if (entries[0].isIntersecting && hasMore && !isFetchingRef.current) {
           fetchPosts(nextCursor);
         }
       },
