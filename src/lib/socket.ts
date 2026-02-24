@@ -23,6 +23,15 @@ export interface ServerToClientEvents {
   'match:extend_approved': (data: { addedSeconds: number; newRemaining: number }) => void;
   'match:extend_rejected': (data: Record<string, never>) => void;
   'match:error': (data: { message: string }) => void;
+  'notification:new': (data: {
+    id: string;
+    type: 'comment' | 'like';
+    title: string;
+    body: string;
+    data: Record<string, unknown>;
+    is_read: boolean;
+    created_at: string;
+  }) => void;
   'room:update': (data: { roomId: string; currentParticipants: number }) => void;
   'room:joined': (data: { roomId: string }) => void;
   'room:left': (data: { roomId: string }) => void;
