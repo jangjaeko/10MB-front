@@ -3,9 +3,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useNotificationStore } from '@/stores/useNotificationStore';
 
 export const BottomNav = () => {
   const pathname = usePathname();
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
 
   const isHome = pathname === '/';
   const isCommunity = pathname === '/community';
@@ -81,24 +83,30 @@ export const BottomNav = () => {
 
         {/* 알림 탭 */}
         <Link href="/notifications" className="flex flex-col items-center justify-center flex-1 py-2 relative">
-          <svg
-            className={`w-6 h-6 ${isNotifications ? 'text-orange-500' : 'text-gray-400'}`}
-            fill={isNotifications ? 'currentColor' : 'none'}
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={isNotifications ? 0 : 1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-            />
-          </svg>
+          <div className="relative">
+            <svg
+              className={`w-6 h-6 ${isNotifications ? 'text-orange-500' : 'text-gray-400'}`}
+              fill={isNotifications ? 'currentColor' : 'none'}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={isNotifications ? 0 : 1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              />
+            </svg>
+            {/* 읽지 않은 알림 배지 */}
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1.5 min-w-[16px] h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold px-0.5 leading-none">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </div>
           <span className={`text-[10px] mt-0.5 ${isNotifications ? 'text-orange-500 font-semibold' : 'text-gray-400'}`}>
             알림
           </span>
-          {/* 읽지 않은 알림 배지 (추후 활성화) */}
-          {/* <span className="absolute top-1 right-3 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">3</span> */}
         </Link>
 
         {/* 마이페이지 탭 */}

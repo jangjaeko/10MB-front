@@ -150,3 +150,27 @@ export interface PostListResponse {
   nextCursor: string | null;
   hasMore: boolean;
 }
+
+// Notification types
+export type NotificationType = 'comment' | 'like';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  data: {
+    postId?: string;
+    commentId?: string;
+    commenterNickname?: string;
+    likerNickname?: string;
+  };
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface NotificationListResponse {
+  notifications: Notification[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}

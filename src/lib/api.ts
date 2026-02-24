@@ -225,6 +225,32 @@ class ApiClient {
   async toggleLike(postId: string) {
     return this.request(`/api/posts/${postId}/like`, { method: 'POST' });
   }
+
+  // --- Notifications ---
+
+  // 알림 목록 조회 (커서 기반 페이지네이션)
+  async getNotifications(params?: { cursor?: string; limit?: number }) {
+    const query = new URLSearchParams();
+    if (params?.cursor) query.set('cursor', params.cursor);
+    if (params?.limit) query.set('limit', String(params.limit));
+    const qs = query.toString();
+    return this.request(`/api/notifications${qs ? `?${qs}` : ''}`);
+  }
+
+  // 읽지 않은 알림 수 조회
+  async getUnreadCount(): Promise<{ count: number }> {
+    return this.request('/api/notifications/unread-count');
+  }
+
+  // 단건 읽음 처리
+  async markNotificationRead(id: string) {
+    return this.request(`/api/notifications/${id}/read`, { method: 'PATCH' });
+  }
+
+  // 전체 읽음 처리
+  async markAllNotificationsRead() {
+    return this.request('/api/notifications/read-all', { method: 'PATCH' });
+  }
 }
 
 export const api = new ApiClient(API_URL);
