@@ -3,21 +3,22 @@
 
 import { useState } from 'react';
 import type { ReportReason } from '@/types';
+import { useT } from '@/hooks/useT';
 
 interface ReportModalProps {
   onSubmit: (reason: ReportReason, description?: string) => Promise<void>;
   onClose: () => void;
 }
 
-// 신고 사유 목록
-const REPORT_REASONS: { value: ReportReason; label: string }[] = [
-  { value: 'harassment', label: '욕설 / 폭언' },
-  { value: 'inappropriate', label: '성희롱' },
-  { value: 'spam', label: '스팸 / 광고' },
-  { value: 'other', label: '기타' },
-];
-
 export const ReportModal = ({ onSubmit, onClose }: ReportModalProps) => {
+  const { t } = useT();
+
+  const REPORT_REASONS: { value: ReportReason; label: string }[] = [
+    { value: 'harassment', label: t('match.reportHarassment') },
+    { value: 'inappropriate', label: t('match.reportSexual') },
+    { value: 'spam', label: t('match.reportSpam') },
+    { value: 'other', label: t('match.reportOther') },
+  ];
   const [reason, setReason] = useState<ReportReason | null>(null);
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

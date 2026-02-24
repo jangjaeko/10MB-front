@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import type { Comment } from '@/types';
 import { CommentItem } from './CommentItem';
+import { useT } from '@/hooks/useT';
 
 interface CommentSectionProps {
   comments: Comment[];
@@ -21,6 +22,7 @@ export const CommentSection = ({
   onDelete,
 }: CommentSectionProps) => {
   const [text, setText] = useState('');
+  const { t } = useT();
 
   const handleSubmit = async () => {
     if (!text.trim() || isSubmitting) return;
@@ -34,8 +36,8 @@ export const CommentSection = ({
       <div>
         {comments.length === 0 ? (
           <div className="text-center py-10">
-            <p className="text-gray-600 text-sm">아직 댓글이 없어요</p>
-            <p className="text-gray-700 text-xs mt-1">첫 번째 댓글을 남겨보세요!</p>
+            <p className="text-gray-600 text-sm">{t('community.noComments')}</p>
+            <p className="text-gray-700 text-xs mt-1">{t('community.noCommentsBody')}</p>
           </div>
         ) : (
           comments.map((comment) => (
@@ -57,7 +59,7 @@ export const CommentSection = ({
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            placeholder="댓글을 입력해주세요"
+            placeholder={t('community.commentPlaceholder')}
             className="flex-1 bg-gray-800 text-white text-sm rounded-full px-4 py-2.5 outline-none placeholder:text-gray-500"
           />
           <button
@@ -69,7 +71,7 @@ export const CommentSection = ({
                 : 'bg-gray-800 text-gray-600'
             }`}
           >
-            등록
+            {t('community.commentButton')}
           </button>
         </div>
       </div>

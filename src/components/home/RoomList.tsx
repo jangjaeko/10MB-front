@@ -3,6 +3,7 @@
 
 import { RoomCard } from './RoomCard';
 import type { Room } from '@/types';
+import { useT } from '@/hooks/useT';
 
 interface RoomListProps {
   rooms: Room[];
@@ -10,10 +11,11 @@ interface RoomListProps {
 }
 
 export const RoomList = ({ rooms, onJoin }: RoomListProps) => {
+  const { t } = useT();
   if (rooms.length === 0) {
     return (
       <div className="text-center py-10">
-        <p className="text-gray-500 text-sm">대화방을 불러오는 중...</p>
+        <p className="text-gray-500 text-sm">{t('home.loadingRooms')}</p>
       </div>
     );
   }

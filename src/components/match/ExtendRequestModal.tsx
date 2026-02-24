@@ -1,6 +1,8 @@
 // 연장 요청 모달 (요청자: 대기 화면, 수신자: 수락/거절 선택)
 'use client';
 
+import { useT } from '@/hooks/useT';
+
 type ExtendStatus = 'none' | 'requested' | 'received' | 'approved' | 'rejected';
 
 interface ExtendRequestModalProps {
@@ -14,6 +16,7 @@ export const ExtendRequestModal = ({
   partnerNickname,
   onRespond,
 }: ExtendRequestModalProps) => {
+  const { t } = useT();
   if (extendStatus !== 'requested' && extendStatus !== 'received') return null;
 
   return (
@@ -30,10 +33,10 @@ export const ExtendRequestModal = ({
               </div>
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-2">
-              연장 요청 중
+              {t('match.extendRequesting')}
             </h3>
             <p className="text-sm text-gray-400 text-center">
-              상대방의 응답을 기다리고 있어요...
+              {t('match.extendWaiting')}
             </p>
           </>
         ) : (
@@ -45,23 +48,23 @@ export const ExtendRequestModal = ({
               </div>
             </div>
             <h3 className="text-lg font-bold text-white text-center mb-2">
-              5분 연장 요청
+              {t('match.extendReceived')}
             </h3>
             <p className="text-sm text-gray-400 text-center mb-6">
-              {partnerNickname}님이 대화를 5분 더 하고 싶어해요
+              {t('match.extendMessage', { nickname: partnerNickname })}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => onRespond(false)}
                 className="flex-1 py-3 rounded-xl bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors"
               >
-                괜찮아요
+                {t('match.extendDecline')}
               </button>
               <button
                 onClick={() => onRespond(true)}
                 className="flex-1 py-3 rounded-xl bg-orange-500 text-white font-medium hover:bg-orange-600 transition-colors"
               >
-                좋아요!
+                {t('match.extendAccept')}
               </button>
             </div>
           </>

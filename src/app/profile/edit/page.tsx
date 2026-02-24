@@ -9,6 +9,7 @@ import { Tag } from '@/components/common/Tag';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@/lib/api';
 import { INTEREST_TAGS } from '@/types';
+import { useT } from '@/hooks/useT';
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function ProfileEditPage() {
   const [interests, setInterests] = useState<string[]>(user?.interests ?? []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t, ti } = useT();
 
   // 닉네임 중복 체크 상태
   const [nicknameStatus, setNicknameStatus] = useState<
@@ -64,15 +66,15 @@ export default function ProfileEditPage() {
   // 프로필 저장 처리
   const handleSave = async () => {
     if (nickname.length < 2) {
-      setError('닉네임은 2자 이상이어야 합니다.');
+      setError(t('profile.nicknameTooShort'));
       return;
     }
     if (nicknameStatus === 'taken') {
-      setError('이미 사용 중인 닉네임입니다.');
+      setError(t('profile.nicknameTaken'));
       return;
     }
     if (interests.length < 3) {
-      setError('관심사를 3개 이상 선택해주세요.');
+      setError(t('profile.interestRequired'));
       return;
     }
 
@@ -84,7 +86,7 @@ export default function ProfileEditPage() {
       setUser(updatedUser as any);
       router.push('/profile');
     } catch (err: any) {
-      setError(err.message || '프로필 수정에 실패했습니다.');
+      setError(err.message || t('profile.editFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +103,7 @@ export default function ProfileEditPage() {
   return (
     <>
       <Header
-        title="프로필 수정"
+        title={t('profile.editTitle')}
         showBack
         onBack={() => router.push('/profile')}
       />
@@ -109,7 +111,7 @@ export default function ProfileEditPage() {
         {/* 닉네임 */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            닉네임
+            {t('profile.nickname')}
           </label>
           <div className="relative">
             <input
@@ -117,7 +119,7 @@ export default function ProfileEditPage() {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 ${nicknameBorderClass}`}
-              placeholder="닉네임을 입력하세요"
+              placeholder={t('profile.nicknamePlaceholder')}
               maxLength={20}
             />
             {/* 상태 아이콘 */}
@@ -141,23 +143,23 @@ export default function ProfileEditPage() {
             </div>
           </div>
           {nicknameStatus === 'taken' && (
-            <p className="text-red-500 text-xs mt-1">이미 사용 중인 닉네임입니다</p>
+            <p className="text-red-500 text-xs mt-1">{t('profile.nicknameTaken')}</p>
           )}
           {nicknameStatus === 'available' && (
-            <p className="text-green-500 text-xs mt-1">사용 가능한 닉네임입니다</p>
+            <p className="text-green-500 text-xs mt-1">{t('profile.nicknameAvailable')}</p>
           )}
         </div>
 
         {/* 관심사 */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            관심사 ({interests.length}개 선택, 3개 이상)
+            {t('profile.interestLabel', { n: interests.length })}
           </label>
           <div className="flex flex-wrap gap-2">
             {INTEREST_TAGS.map((interest) => (
               <Tag
                 key={interest}
-                label={interest}
+                label={ti(interest)}
                 selected={interests.includes(interest)}
                 onClick={() => handleToggleInterest(interest)}
               />
@@ -176,7 +178,7 @@ export default function ProfileEditPage() {
           className="w-full"
           size="lg"
         >
-          저장
+          {t('profile.save')}
         </Button>
       </div>
     </>

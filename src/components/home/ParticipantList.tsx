@@ -1,6 +1,8 @@
 // 대화방 참여자 목록 (닉네임, 관심사, 말하기 감지, 마이크 상태)
 'use client';
 
+import { useT } from '@/hooks/useT';
+
 interface Participant {
   userId: string;
   nickname: string;
@@ -20,10 +22,11 @@ export const ParticipantList = ({
   myUserId,
   isMicOn,
 }: ParticipantListProps) => {
+  const { t, ti } = useT();
   if (participants.length === 0) {
     return (
       <div className="text-center py-4">
-        <p className="text-gray-500 text-sm">아직 참여자가 없어요</p>
+        <p className="text-gray-500 text-sm">{t('home.noParticipants')}</p>
       </div>
     );
   }
@@ -61,7 +64,7 @@ export const ParticipantList = ({
                   {p.nickname}
                 </span>
                 {isMe && (
-                  <span className="text-[10px] text-orange-400 font-medium shrink-0">나</span>
+                  <span className="text-[10px] text-orange-400 font-medium shrink-0">{t('home.me')}</span>
                 )}
               </div>
               {p.interests.length > 0 && (
@@ -71,7 +74,7 @@ export const ParticipantList = ({
                       key={tag}
                       className="text-[10px] text-gray-400 bg-gray-700/50 px-1.5 py-0.5 rounded-full truncate"
                     >
-                      {tag}
+                      {ti(tag)}
                     </span>
                   ))}
                 </div>

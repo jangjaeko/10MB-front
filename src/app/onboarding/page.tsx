@@ -8,6 +8,7 @@ import { Tag } from '@/components/common/Tag';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { api } from '@/lib/api';
 import { INTEREST_TAGS } from '@/types';
+import { useT } from '@/hooks/useT';
 
 type Step = 'nickname' | 'interests' | 'microphone';
 const STEPS: Step[] = ['nickname', 'interests', 'microphone'];
@@ -22,6 +23,7 @@ export default function OnboardingPage() {
   const [interests, setInterests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t, ti } = useT();
 
   // 마이크 테스트 관련 상태
   const [micPermission, setMicPermission] = useState<'idle' | 'granted' | 'denied'>('idle');
@@ -34,22 +36,22 @@ export default function OnboardingPage() {
   const checkNickname = useCallback(async (value: string) => {
     if (value.length < 2) {
       setNicknameStatus('error');
-      setNicknameMessage('닉네임은 2자 이상이어야 합니다');
+      setNicknameMessage(t('onboarding.nicknameTooShort'));
       return;
     }
 
     setNicknameStatus('checking');
-    setNicknameMessage('확인 중...');
+    setNicknameMessage(t('onboarding.checkingNickname'));
 
     try {
       const result = await api.checkNickname(value);
       setNicknameStatus(result.available ? 'available' : 'taken');
-      setNicknameMessage(result.message);
+      setNicknameMessage(result.available ? t('onboarding.nicknamePrompt') : t('onboarding.nicknameDuplicated'));
     } catch {
       setNicknameStatus('error');
-      setNicknameMessage('중복 확인에 실패했습니다');
+      setNicknameMessage(t('onboarding.nicknameCheckFailed'));
     }
-  }, []);
+  }, [t]);
 
   // 닉네임 입력 시 디바운스 처리
   const handleNicknameChange = (value: string) => {
@@ -74,11 +76,11 @@ export default function OnboardingPage() {
   const handleNicknameSubmit = () => {
     if (nicknameStatus !== 'available') {
       if (nickname.length < 2) {
-        setError('닉네임은 2자 이상이어야 합니다.');
+        setError(t('onboarding.nicknameTooShort'));
       } else if (nicknameStatus === 'taken') {
-        setError('이미 사용 중인 닉네임입니다.');
+        setError(t('onboarding.nicknameDuplicated'));
       } else {
-        setError('닉네임 확인이 필요합니다.');
+        setError(t('onboarding.nicknameConfirmRequired'));
       }
       return;
     }
@@ -98,7 +100,7 @@ export default function OnboardingPage() {
   // 관심사 단계 → 마이크 단계
   const handleInterestsSubmit = () => {
     if (interests.length < 3) {
-      setError('관심사를 3개 이상 선택해주세요.');
+      setError(t('onboarding.interestRequired'));
       return;
     }
     setError('');
@@ -133,7 +135,7 @@ export default function OnboardingPage() {
       updateVolume();
     } catch {
       setMicPermission('denied');
-      setError('마이크 권한이 필요합니다. 브라우저 설정에서 허용해주세요.');
+      setError(t('onboarding.micPermissionDenied'));
     }
   };
 
@@ -173,7 +175,7 @@ export default function OnboardingPage() {
       setUser(userData as any);
       router.push('/');
     } catch (err: any) {
-      setError(err.message || '온보딩 완료에 실패했습니다.');
+      setError(err.message || t('onboarding.onboardingFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -214,9 +216,9 @@ export default function OnboardingPage() {
       {/* Step 1: 닉네임 */}
       {step === 'nickname' && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">반가워요!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('onboarding.welcomeTitle')}</h1>
           <p className="text-gray-500 mb-8">
-            대화할 때 사용할 닉네임을 정해주세요.
+            {t('onboarding.nicknamePrompt')}
           </p>
 
           <div className="relative mb-2">
@@ -231,7 +233,7 @@ export default function OnboardingPage() {
                     ? 'border-red-400 focus:ring-red-500'
                     : 'border-gray-200 focus:ring-indigo-500'
               }`}
-              placeholder="닉네임 (2~20자)"
+              placeholder={t('onboarding.nicknamePlaceholder')}
               maxLength={20}
               autoFocus
             />
@@ -266,7 +268,7 @@ export default function OnboardingPage() {
               className="w-full"
               size="lg"
             >
-              다음
+              {t('onboarding.next')}
             </Button>
           </div>
         </div>
@@ -275,16 +277,16 @@ export default function OnboardingPage() {
       {/* Step 2: 관심사 선택 */}
       {step === 'interests' && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">관심사 선택</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('onboarding.interestTitle')}</h1>
           <p className="text-gray-500 mb-8">
-            비슷한 관심사를 가진 사람과 매칭해드려요. (3개 이상)
+            {t('onboarding.interestPrompt')}
           </p>
 
           <div className="flex flex-wrap gap-2 mb-6">
             {INTEREST_TAGS.map((interest) => (
               <Tag
                 key={interest}
-                label={interest}
+                label={ti(interest)}
                 selected={interests.includes(interest)}
                 onClick={() => handleToggleInterest(interest)}
               />
@@ -300,7 +302,7 @@ export default function OnboardingPage() {
               className="flex-1"
               size="lg"
             >
-              이전
+              {t('onboarding.prev')}
             </Button>
             <Button
               onClick={handleInterestsSubmit}
@@ -308,7 +310,7 @@ export default function OnboardingPage() {
               className="flex-1"
               size="lg"
             >
-              다음 ({interests.length}/3)
+              {t('onboarding.interestNext', { n: interests.length })}
             </Button>
           </div>
         </div>
@@ -336,11 +338,11 @@ export default function OnboardingPage() {
             </svg>
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">마이크 테스트</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('onboarding.micTitle')}</h1>
           <p className="text-gray-500 mb-8">
             {micPermission === 'granted'
-              ? '말해보세요! 볼륨이 표시됩니다.'
-              : '음성 대화를 위해 마이크 권한이 필요합니다.'}
+              ? t('onboarding.micPrompt2')
+              : t('onboarding.micPrompt')}
           </p>
 
           {/* 볼륨 레벨 바 */}
@@ -355,7 +357,7 @@ export default function OnboardingPage() {
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-2">마이크가 정상 작동 중입니다</p>
+              <p className="text-xs text-gray-400 mt-2">{t('onboarding.micWorking')}</p>
             </div>
           )}
 
@@ -368,7 +370,7 @@ export default function OnboardingPage() {
               className="flex-1"
               size="lg"
             >
-              이전
+              {t('onboarding.prev')}
             </Button>
 
             {micPermission !== 'granted' ? (
@@ -377,7 +379,7 @@ export default function OnboardingPage() {
                 className="flex-1"
                 size="lg"
               >
-                마이크 허용
+                {t('onboarding.allowMic')}
               </Button>
             ) : (
               <Button
@@ -386,7 +388,7 @@ export default function OnboardingPage() {
                 className="flex-1"
                 size="lg"
               >
-                완료
+                {t('onboarding.done')}
               </Button>
             )}
           </div>

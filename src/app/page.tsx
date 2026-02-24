@@ -11,6 +11,7 @@ import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
 import { getSocket } from '@/lib/socket';
 import type { Room } from '@/types';
+import { useT } from '@/hooks/useT';
 
 // userId → Agora uid 해시 (백엔드와 동일한 로직)
 function userIdToAgoraUid(userId: string): number {
@@ -42,6 +43,7 @@ export default function HomePage() {
   activeRoomRef.current = activeRoom;
 
   const { isConnected, isMicOn, connectionError, speakingUids, myUid, join, leave, toggleMic } = useVoice('room');
+  const { t } = useT();
 
   // Agora speakingUids → userId 변환
   useEffect(() => {
@@ -112,7 +114,7 @@ export default function HomePage() {
       if (activeRoomRef.current?.id === data.roomId && data.user.userId !== user?.id) {
         window.dispatchEvent(
           new CustomEvent('room:toast', {
-            detail: { message: `${data.user.nickname}님이 들어왔어요`, type: 'join' },
+            detail: { message: t('home.joined', { nickname: data.user.nickname }), type: 'join' },
           }),
         );
       }
@@ -123,7 +125,7 @@ export default function HomePage() {
       if (activeRoomRef.current?.id === data.roomId && data.user.userId !== user?.id) {
         window.dispatchEvent(
           new CustomEvent('room:toast', {
-            detail: { message: `${data.user.nickname}님이 나갔어요`, type: 'leave' },
+            detail: { message: t('home.left', { nickname: data.user.nickname }), type: 'leave' },
           }),
         );
       }
@@ -140,7 +142,7 @@ export default function HomePage() {
       socket.off('room:user_joined', handleUserJoined);
       socket.off('room:user_left', handleUserLeft);
     };
-  }, [accessToken, user?.id]);
+  }, [accessToken, user?.id, t]);
 
   // 로딩 중이거나 비인증 상태면 빈 화면 (useAuth에서 리다이렉트 처리)
   if (isLoading || !isAuthenticated) {
@@ -219,7 +221,7 @@ export default function HomePage() {
 
         {/* 대화방 목록 */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 mb-3">쉬는 공간</h3>
+          <h3 className="text-sm font-semibold text-gray-500 mb-3">{t('home.restSpace')}</h3>
           <RoomList rooms={rooms} onJoin={handleJoinRoom} />
         </div>
       </div>

@@ -19,6 +19,7 @@ import { useVoice } from '@/hooks/useVoice';
 import { useTimer } from '@/hooks/useTimer';
 import { api } from '@/lib/api';
 import type { Rating, ReportReason } from '@/types';
+import { useT } from '@/hooks/useT';
 
 // 매칭 성공 화면 표시 시간 (ms)
 const MATCH_FOUND_DELAY = 2000;
@@ -47,6 +48,7 @@ export default function MatchPage() {
   const { startMatch, cancelMatch, leaveMatch, requestExtend, respondExtend, pingOnline, isReconnecting, error: socketError } = useSocket();
   const { isConnected, isMicOn, connectionError, leave, toggleMic } = useVoice();
   const { remainingSeconds, formattedTime, progress, isWarning, isUrgent } = useTimer();
+  const { t } = useT();
 
   // "아무거나" 토글 상태
   const [isRandom, setIsRandom] = useState(false);
@@ -207,10 +209,10 @@ export default function MatchPage() {
 
     return (
       <>
-        <Header title="10분 대화" showBack onBack={() => router.push('/')} />
+        <Header title={t('match.topicQuestion')} showBack onBack={() => router.push('/')} />
         <div className="pt-16 pb-8 px-4">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
-            어떤 주제로 대화할까요?
+            {t('match.topicQuestion')}
           </h2>
 
           <InterestSelector
@@ -227,7 +229,7 @@ export default function MatchPage() {
             className="w-full mt-6 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white"
             size="lg"
           >
-            매칭 시작
+            {t('match.startMatch')}
           </Button>
         </div>
       </>
@@ -238,7 +240,7 @@ export default function MatchPage() {
   if (phase === 'searching') {
     return (
       <>
-        <Header title="매칭 중" showBack onBack={handleBack} />
+        <Header title={t('match.searching')} showBack onBack={handleBack} />
         <div className="pt-16">
           <MatchingLoader
             waitingCount={waitingCount}
@@ -257,7 +259,7 @@ export default function MatchPage() {
   if (phase === 'matched' && partner) {
     return (
       <>
-        <Header title="매칭 완료" />
+        <Header title={t('match.found')} />
         <div className="pt-16">
           <MatchFound
             partnerNickname={partner.nickname}
@@ -272,13 +274,13 @@ export default function MatchPage() {
   if (phase === 'active' && partner) {
     return (
       <>
-        <Header title="대화 중" />
+        <Header title={t('match.active')} />
 
         {/* 소켓 재연결 중 배너 */}
         {isReconnecting && (
           <div className="fixed top-14 left-0 right-0 z-50 flex items-center justify-center gap-2 bg-yellow-500/90 py-2 text-sm font-medium text-gray-900">
             <span className="h-2 w-2 animate-pulse rounded-full bg-gray-900" />
-            서버 재연결 중...
+            {t('match.reconnecting')}
           </div>
         )}
 

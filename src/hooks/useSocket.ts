@@ -5,6 +5,7 @@ import { useEffect, useCallback, useRef, useState } from 'react';
 import { connectSocket, disconnectSocket, TypedSocket } from '@/lib/socket';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useMatchStore } from '@/stores/useMatchStore';
+import { useT } from '@/hooks/useT';
 
 export const useSocket = () => {
   const socketRef = useRef<TypedSocket | null>(null);
@@ -20,6 +21,7 @@ export const useSocket = () => {
     reset,
   } = useMatchStore();
 
+  const { t } = useT();
   // 연결 상태 관리
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +60,7 @@ export const useSocket = () => {
     };
     const onReconnectFailed = () => {
       setIsReconnecting(false);
-      setError('서버 연결이 끊겼습니다. 페이지를 새로고침해주세요.');
+      setError(t('errors.reconnectFailed'));
     };
     manager.on('reconnect_attempt', onReconnectAttempt);
     manager.on('reconnect', onReconnect);
@@ -142,7 +144,7 @@ export const useSocket = () => {
       socketRef.current = null;
       setIsConnected(false);
     };
-  }, [accessToken, setMatchFound, setRemainingSeconds, setWaitingCount, setEnded, setExtendStatus, setExtended, setTotalSeconds, reset]);
+  }, [accessToken, t, setMatchFound, setRemainingSeconds, setWaitingCount, setEnded, setExtendStatus, setExtended, setTotalSeconds, reset]);
 
   // 매칭 시작 emit
   const startMatch = useCallback((interests: string[]) => {

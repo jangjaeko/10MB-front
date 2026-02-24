@@ -3,6 +3,8 @@
 
 import { useRouter } from 'next/navigation';
 import type { Notification } from '@/types';
+import { useT } from '@/hooks/useT';
+import type { TranslationKey } from '@/lib/i18n';
 
 interface Props {
   notifications: Notification[];
@@ -32,21 +34,22 @@ const NotificationIcon = ({ type }: { type: Notification['type'] }) => {
   );
 };
 
-// 상대 시간 표시 (예: "3분 전", "2시간 전")
-const timeAgo = (dateStr: string): string => {
+// 상대 시간 표시
+const timeAgo = (dateStr: string, t: (key: TranslationKey, vars?: Record<string, string | number>) => string): string => {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return '방금';
-  if (mins < 60) return `${mins}분 전`;
+  if (mins < 1) return t('notifications.justNow');
+  if (mins < 60) return t('notifications.minsAgo', { n: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}시간 전`;
+  if (hours < 24) return t('notifications.hoursAgo', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}일 전`;
-  return new Date(dateStr).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+  if (days < 7) return t('notifications.daysAgo', { n: days });
+  return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 };
 
 export const NotificationList = ({ notifications, onMarkRead, onMarkAllRead, hasUnread }: Props) => {
   const router = useRouter();
+  const { t } = useT();
 
   const handleTap = (notif: Notification) => {
     if (!notif.is_read) {
@@ -67,8 +70,8 @@ export const NotificationList = ({ notifications, onMarkRead, onMarkAllRead, has
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </div>
-        <p className="text-gray-500 font-medium">아직 알림이 없어요</p>
-        <p className="text-sm text-gray-400 mt-1">커뮤니티에 글을 올려보세요!</p>
+        <p className="text-gray-500 font-medium">{t('notifications.empty')}</p>
+        <p className="text-sm text-gray-400 mt-1">{t('notifications.emptyBody')}</p>
       </div>
     );
   }
@@ -82,7 +85,7 @@ export const NotificationList = ({ notifications, onMarkRead, onMarkAllRead, has
             onClick={onMarkAllRead}
             className="text-sm text-orange-500 font-medium hover:text-orange-600 active:text-orange-700"
           >
-            모두 읽음
+            {t('notifications.markAllRead')}
           </button>
         </div>
       )}
@@ -112,7 +115,7 @@ export const NotificationList = ({ notifications, onMarkRead, onMarkAllRead, has
                 <p className={`text-sm leading-snug ${!notif.is_read ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>
                   {notif.body}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">{timeAgo(notif.created_at)}</p>
+                <p className="text-xs text-gray-400 mt-1">{timeAgo(notif.created_at, t)}</p>
               </div>
             </button>
 

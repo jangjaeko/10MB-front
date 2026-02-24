@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useT } from '@/hooks/useT';
 
 interface MatchingLoaderProps {
   waitingCount: number;
@@ -21,6 +22,7 @@ export const MatchingLoader = ({
   onGoHome,
 }: MatchingLoaderProps) => {
   const [elapsed, setElapsed] = useState(0);
+  const { t } = useT();
 
   // 대기 시간 카운트업 (1초 간격)
   useEffect(() => {
@@ -50,23 +52,23 @@ export const MatchingLoader = ({
           </svg>
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">
-          지금은 대화 가능한 분이 적어요
+          {t('match.noUsersTitle')}
         </h2>
         <p className="text-gray-500 text-sm mb-8">
-          잠시 후 다시 시도해주세요
+          {t('match.noUsersBody')}
         </p>
         <div className="flex gap-3 w-full max-w-xs">
           <button
             onClick={onGoHome}
             className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors"
           >
-            홈으로
+            {t('common.goHome')}
           </button>
           <button
             onClick={onRetry}
             className="flex-1 py-3 rounded-xl bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors"
           >
-            다시 시도
+            {t('common.retry')}
           </button>
         </div>
       </div>
@@ -107,10 +109,10 @@ export const MatchingLoader = ({
 
       {/* 텍스트 */}
       <h2 className="text-xl font-bold text-gray-900 mb-2">
-        대화 상대를 찾고 있어요
+        {t('match.searchingTitle')}
       </h2>
       <p className="text-gray-500 text-sm mb-1">
-        현재 <span className="font-semibold text-orange-500">{waitingCount}</span>명이 대기 중
+        {t('match.waitingCount', { n: waitingCount })}
       </p>
 
       {/* 대기 시간 */}
@@ -123,7 +125,7 @@ export const MatchingLoader = ({
         onClick={onCancel}
         className="px-8 py-3 rounded-xl bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 active:bg-gray-300 transition-colors"
       >
-        취소
+        {t('common.cancel')}
       </button>
     </div>
   );

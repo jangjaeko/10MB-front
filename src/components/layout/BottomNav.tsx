@@ -4,10 +4,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useNotificationStore } from '@/stores/useNotificationStore';
+import { useT } from '@/hooks/useT';
 
 export const BottomNav = () => {
   const pathname = usePathname();
   const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const { t } = useT();
 
   const isHome = pathname === '/';
   const isCommunity = pathname === '/community';
@@ -34,7 +36,7 @@ export const BottomNav = () => {
             />
           </svg>
           <span className={`text-[10px] mt-0.5 ${isHome ? 'text-orange-500 font-semibold' : 'text-gray-400'}`}>
-            홈
+            {t('nav.home')}
           </span>
         </Link>
 
@@ -54,7 +56,7 @@ export const BottomNav = () => {
             />
           </svg>
           <span className={`text-[10px] mt-0.5 ${isCommunity ? 'text-orange-500 font-semibold' : 'text-gray-400'}`}>
-            커뮤니티
+            {t('nav.community')}
           </span>
         </Link>
 
@@ -105,7 +107,7 @@ export const BottomNav = () => {
             )}
           </div>
           <span className={`text-[10px] mt-0.5 ${isNotifications ? 'text-orange-500 font-semibold' : 'text-gray-400'}`}>
-            알림
+            {t('nav.notifications')}
           </span>
         </Link>
 
@@ -125,7 +127,7 @@ export const BottomNav = () => {
             />
           </svg>
           <span className={`text-[10px] mt-0.5 ${isProfile ? 'text-orange-500 font-semibold' : 'text-gray-400'}`}>
-            마이페이지
+            {t('nav.profile')}
           </span>
         </Link>
       </div>

@@ -2,6 +2,7 @@
 'use client';
 
 import { Tag } from '@/components/common/Tag';
+import { useT } from '@/hooks/useT';
 
 interface InterestSelectorProps {
   selectedInterests: string[];
@@ -20,6 +21,7 @@ export const InterestSelector = ({
   isRandom,
   onRandomToggle,
 }: InterestSelectorProps) => {
+  const { t, ti } = useT();
   // 관심사 토글
   const handleToggle = (interest: string) => {
     if (selectedInterests.includes(interest)) {
@@ -32,7 +34,7 @@ export const InterestSelector = ({
   return (
     <div className="space-y-5">
       <p className="text-sm text-gray-400">
-        이번 대화에서 나누고 싶은 주제를 선택하세요 (최대 {maxSelect}개)
+        {t('match.interestPrompt', { n: maxSelect })}
       </p>
 
       {/* "아무거나" 토글 */}
@@ -45,7 +47,7 @@ export const InterestSelector = ({
             : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
         }`}
       >
-        아무거나 괜찮아요
+        {t('match.anyTopic')}
       </button>
 
       {/* 관심사 태그 목록 */}
@@ -54,7 +56,7 @@ export const InterestSelector = ({
           {userInterests.map((interest) => (
             <Tag
               key={interest}
-              label={interest}
+              label={ti(interest)}
               selected={selectedInterests.includes(interest)}
               onClick={() => handleToggle(interest)}
             />
@@ -64,7 +66,7 @@ export const InterestSelector = ({
 
       {isRandom && (
         <p className="text-center text-sm text-gray-500">
-          관심사가 비슷한 누구와도 매칭됩니다
+          {t('match.anyTopicDesc')}
         </p>
       )}
     </div>

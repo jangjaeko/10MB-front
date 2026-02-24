@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Timer } from './Timer';
 import { ExtendRequestModal } from './ExtendRequestModal';
+import { useT } from '@/hooks/useT';
 
 type ExtendStatus = 'none' | 'requested' | 'received' | 'approved' | 'rejected';
 
@@ -52,6 +53,7 @@ export const VoiceRoom = ({
   onLeave,
   onReport,
 }: VoiceRoomProps) => {
+  const { t, ti } = useT();
   // 나가기 확인 모달
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   // 30초 토스트
@@ -73,12 +75,12 @@ export const VoiceRoom = ({
   // 연장 승인/거절 토스트
   useEffect(() => {
     if (extendStatus === 'approved') {
-      setShowExtendToast('5분 연장되었어요! 🎉');
+      setShowExtendToast(t('match.extendApproved'));
       const timer = setTimeout(() => setShowExtendToast(null), 3000);
       return () => clearTimeout(timer);
     }
     if (extendStatus === 'rejected') {
-      setShowExtendToast('아쉽지만 다음에 또 만나요');
+      setShowExtendToast(t('match.extendRejected'));
       const timer = setTimeout(() => setShowExtendToast(null), 3000);
       return () => clearTimeout(timer);
     }
@@ -117,8 +119,8 @@ export const VoiceRoom = ({
           {connectionError
             ? connectionError
             : isConnected
-              ? '음성 연결됨'
-              : '음성 연결 중...'}
+              ? t('match.voiceConnected')
+              : t('match.voiceConnecting')}
         </span>
       </div>
 
@@ -167,7 +169,7 @@ export const VoiceRoom = ({
                     : 'bg-gray-800 text-gray-400'
                 }`}
               >
-                {interest}
+                {ti(interest)}
               </span>
             );
           })}
@@ -181,7 +183,7 @@ export const VoiceRoom = ({
             onClick={onRequestExtend}
             className="px-5 py-2.5 rounded-full bg-orange-500/15 text-orange-400 text-sm font-medium hover:bg-orange-500/25 transition-colors ring-1 ring-orange-500/30"
           >
-            5분 더 얘기하기 ⏰
+            {t('match.extendButton')}
           </button>
         </div>
       )}
@@ -197,7 +199,7 @@ export const VoiceRoom = ({
               : 'bg-red-500/20 text-red-400 ring-2 ring-red-500/50'
           }`}
           style={{ width: 72, height: 72 }}
-          aria-label={isMicOn ? '마이크 끄기' : '마이크 켜기'}
+          aria-label={isMicOn ? t('match.voiceConnected') : t('match.voiceConnecting')}
         >
           {isMicOn ? (
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -228,17 +230,17 @@ export const VoiceRoom = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-gray-900 rounded-2xl p-6 mx-4 w-full max-w-xs border border-gray-800">
             <h3 className="text-lg font-bold text-white text-center mb-2">
-              대화를 종료할까요?
+              {t('match.leaveConfirmTitle')}
             </h3>
             <p className="text-sm text-gray-400 text-center mb-6">
-              음성 연결이 끊기고 홈으로 돌아갑니다.
+              {t('match.leaveConfirmBody')}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLeaveModal(false)}
                 className="flex-1 py-3 rounded-xl bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors"
               >
-                취소
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => {
@@ -247,7 +249,7 @@ export const VoiceRoom = ({
                 }}
                 className="flex-1 py-3 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition-colors"
               >
-                나가기
+                {t('match.leave')}
               </button>
             </div>
           </div>
@@ -258,7 +260,7 @@ export const VoiceRoom = ({
       {showToast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce">
           <div className="bg-red-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-red-600/30">
-            곧 대화가 종료됩니다
+            {t('match.soonEnding')}
           </div>
         </div>
       )}

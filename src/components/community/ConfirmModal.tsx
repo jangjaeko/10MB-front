@@ -1,6 +1,8 @@
 // 삭제 확인 모달 (게시글/댓글 공용)
 'use client';
 
+import { useT } from '@/hooks/useT';
+
 interface ConfirmModalProps {
   message: string;
   confirmLabel?: string;
@@ -10,10 +12,11 @@ interface ConfirmModalProps {
 
 export const ConfirmModal = ({
   message,
-  confirmLabel = '삭제',
+  confirmLabel,
   onConfirm,
   onCancel,
 }: ConfirmModalProps) => {
+  const { t } = useT();
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
       {/* 배경 오버레이 */}
@@ -29,14 +32,14 @@ export const ConfirmModal = ({
             onClick={onCancel}
             className="flex-1 py-3 text-sm text-gray-400 hover:bg-gray-800 transition-colors"
           >
-            취소
+            {t('common.cancel')}
           </button>
           <div className="w-px bg-gray-800" />
           <button
             onClick={onConfirm}
             className="flex-1 py-3 text-sm text-red-400 font-semibold hover:bg-gray-800 transition-colors"
           >
-            {confirmLabel}
+            {confirmLabel ?? t('common.delete')}
           </button>
         </div>
       </div>

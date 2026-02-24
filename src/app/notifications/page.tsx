@@ -8,10 +8,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNotificationStore } from '@/stores/useNotificationStore';
 import { api } from '@/lib/api';
 import type { Notification, NotificationListResponse } from '@/types';
+import { useT } from '@/hooks/useT';
 
 export default function NotificationsPage() {
   const { isLoading, isAuthenticated } = useAuth();
   const { setUnreadCount, decrementBy } = useNotificationStore();
+  const { t } = useT();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export default function NotificationsPage() {
 
   return (
     <>
-      <Header title="알림" />
+      <Header title={t('notifications.title')} />
       <div className="pt-14 pb-20">
         {isFetching ? (
           <div className="flex justify-center py-20">
@@ -104,7 +106,7 @@ export default function NotificationsPage() {
               disabled={isLoadingMore}
               className="px-5 py-2 text-sm font-medium text-orange-500 bg-orange-50 rounded-full hover:bg-orange-100 disabled:opacity-50"
             >
-              {isLoadingMore ? '불러오는 중...' : '더 보기'}
+              {isLoadingMore ? t('notifications.loading') : t('notifications.loadMore')}
             </button>
           </div>
         )}

@@ -4,18 +4,22 @@
 import { useState } from 'react';
 import type { Comment } from '@/types';
 import { ConfirmModal } from './ConfirmModal';
+import { useT } from '@/hooks/useT';
+import type { TranslationKey } from '@/lib/i18n';
+
+type TFn = (key: TranslationKey, vars?: Record<string, string | number>) => string;
 
 // 상대 시간 표시
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: TFn): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return '방금';
-  if (minutes < 60) return `${minutes}분 전`;
+  if (minutes < 1) return t('community.justNow');
+  if (minutes < 60) return t('community.minsAgo', { n: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}시간 전`;
+  if (hours < 24) return t('community.hoursAgo', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}일 전`;
-  return new Date(dateStr).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+  if (days < 7) return t('community.daysAgo', { n: days });
+  return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 interface CommentItemProps {
@@ -26,6 +30,7 @@ interface CommentItemProps {
 
 export const CommentItem = ({ comment, isMine, onDelete }: CommentItemProps) => {
   const [showConfirm, setShowConfirm] = useState(false);
+  const { t } = useT();
 
   return (
     <>
@@ -43,7 +48,7 @@ export const CommentItem = ({ comment, isMine, onDelete }: CommentItemProps) => 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-semibold text-white">{comment.authorNickname}</span>
-                <span className="text-[10px] text-gray-500">{timeAgo(comment.created_at)}</span>
+                <span className="text-[10px] text-gray-500">{timeAgo(comment.created_at, t)}</span>
               </div>
               {isMine && (
                 <button
@@ -66,7 +71,7 @@ export const CommentItem = ({ comment, isMine, onDelete }: CommentItemProps) => 
       {/* 삭제 확인 모달 */}
       {showConfirm && (
         <ConfirmModal
-          message="댓글을 삭제하시겠어요?"
+          message={t('community.deleteCommentConfirm')}
           onConfirm={() => {
             onDelete(comment.id);
             setShowConfirm(false);

@@ -5,27 +5,31 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import type { Post, PostCategory } from '@/types';
+import { useT } from '@/hooks/useT';
+import type { TranslationKey } from '@/lib/i18n';
 
-// 카테고리 라벨 매핑
-const CATEGORY_LABEL: Record<PostCategory, string> = {
-  free: '자유',
-  concern: '고민',
-  humor: '유머',
-  topic: '대화주제추천',
-  review: '대화후기',
+type TFn = (key: TranslationKey, vars?: Record<string, string | number>) => string;
+
+// 카테고리 → 번역 키 매핑
+const CATEGORY_KEY: Record<PostCategory, TranslationKey> = {
+  free: 'community.catFree',
+  concern: 'community.catConcern',
+  humor: 'community.catHumor',
+  topic: 'community.catTopic',
+  review: 'community.catReview',
 };
 
 // 상대 시간 표시
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: TFn): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return '방금';
-  if (minutes < 60) return `${minutes}분 전`;
+  if (minutes < 1) return t('community.justNow');
+  if (minutes < 60) return t('community.minsAgo', { n: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}시간 전`;
+  if (hours < 24) return t('community.hoursAgo', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}일 전`;
-  return new Date(dateStr).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+  if (days < 7) return t('community.daysAgo', { n: days });
+  return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 interface PostCardProps {
@@ -34,6 +38,7 @@ interface PostCardProps {
 
 export const PostCard = ({ post }: PostCardProps) => {
   const router = useRouter();
+  const { t } = useT();
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [isLiked, setIsLiked] = useState(post.isLiked ?? false);
   const [isLiking, setIsLiking] = useState(false);
@@ -84,10 +89,10 @@ export const PostCard = ({ post }: PostCardProps) => {
               {post.authorNickname}
             </span>
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400 shrink-0">
-              {CATEGORY_LABEL[post.category]}
+              {t(CATEGORY_KEY[post.category])}
             </span>
           </div>
-          <span className="text-xs text-gray-500">{timeAgo(post.created_at)}</span>
+          <span className="text-xs text-gray-500">{timeAgo(post.created_at, t)}</span>
         </div>
       </div>
 

@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ParticipantList } from './ParticipantList';
 import type { Room } from '@/types';
+import { useT } from '@/hooks/useT';
 
 interface RoomParticipant {
   userId: string;
@@ -43,6 +44,7 @@ export const ActiveRoomView = ({
   onToggleMic,
   onLeave,
 }: ActiveRoomViewProps) => {
+  const { t } = useT();
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -75,7 +77,7 @@ export const ActiveRoomView = ({
           <div>
             <h2 className="text-white font-bold text-lg">{room.name}</h2>
             <p className="text-gray-400 text-xs">
-              {participants.length}명 참여 중
+              {t('home.activeRoomParticipants', { n: participants.length })}
             </p>
           </div>
         </div>
@@ -87,7 +89,7 @@ export const ActiveRoomView = ({
             }`}
           />
           <span className="text-xs text-gray-400">
-            {isConnected ? '연결됨' : '연결 중...'}
+            {isConnected ? t('home.voiceConnected') : t('home.voiceConnecting')}
           </span>
         </div>
       </div>
@@ -116,14 +118,14 @@ export const ActiveRoomView = ({
                 </div>
               </div>
               <p className="text-gray-400 text-sm">
-                {isConnected ? '대화에 참여 중이에요' : '음성 채널에 연결하는 중...'}
+                {isConnected ? t('home.inRoom') : t('home.connectingRoom')}
               </p>
             </div>
 
             {/* 참여자 목록 */}
             <div>
               <h3 className="text-xs font-semibold text-gray-500 mb-2 px-1">
-                참여자 ({participants.length})
+                {t('home.participantsSection', { n: participants.length })}
               </h3>
               <ParticipantList
                 participants={participants}
@@ -190,20 +192,20 @@ export const ActiveRoomView = ({
       {showLeaveConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
           <div className="bg-gray-900 rounded-2xl p-6 mx-6 w-full max-w-xs text-center border border-gray-800">
-            <h3 className="text-white font-bold text-lg mb-2">대화방 나가기</h3>
-            <p className="text-gray-400 text-sm mb-6">정말 나가시겠어요?</p>
+            <h3 className="text-white font-bold text-lg mb-2">{t('home.leaveRoomTitle')}</h3>
+            <p className="text-gray-400 text-sm mb-6">{t('home.leaveRoomBody')}</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLeaveConfirm(false)}
                 className="flex-1 py-3 rounded-xl bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors"
               >
-                취소
+                {t('common.cancel')}
               </button>
               <button
                 onClick={onLeave}
                 className="flex-1 py-3 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition-colors"
               >
-                나가기
+                {t('home.leave')}
               </button>
             </div>
           </div>

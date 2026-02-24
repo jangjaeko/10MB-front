@@ -2,6 +2,7 @@
 'use client';
 
 import type { Room } from '@/types';
+import { useT } from '@/hooks/useT';
 
 interface RoomCardProps {
   room: Room;
@@ -9,6 +10,7 @@ interface RoomCardProps {
 }
 
 export const RoomCard = ({ room, onJoin }: RoomCardProps) => {
+  const { t } = useT();
   const isFull = room.current_participants >= room.max_participants;
 
   return (
@@ -41,7 +43,7 @@ export const RoomCard = ({ room, onJoin }: RoomCardProps) => {
         </div>
         {isFull && (
           <span className="text-[10px] font-semibold text-red-400 bg-red-500/15 px-2 py-0.5 rounded-full">
-            만석
+            {t('home.full')}
           </span>
         )}
       </div>

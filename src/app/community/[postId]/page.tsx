@@ -9,26 +9,30 @@ import { api } from '@/lib/api';
 import { CommentSection } from '@/components/community/CommentSection';
 import { ConfirmModal } from '@/components/community/ConfirmModal';
 import type { Post, Comment, PostCategory } from '@/types';
+import { useT } from '@/hooks/useT';
+import type { TranslationKey } from '@/lib/i18n';
 
-const CATEGORY_LABEL: Record<PostCategory, string> = {
-  free: '자유',
-  concern: '고민',
-  humor: '유머',
-  topic: '대화주제추천',
-  review: '대화후기',
+type TFn = (key: TranslationKey, vars?: Record<string, string | number>) => string;
+
+const CATEGORY_KEY: Record<PostCategory, TranslationKey> = {
+  free: 'community.catFree',
+  concern: 'community.catConcern',
+  humor: 'community.catHumor',
+  topic: 'community.catTopic',
+  review: 'community.catReview',
 };
 
 // 상대 시간 표시
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: TFn): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return '방금';
-  if (minutes < 60) return `${minutes}분 전`;
+  if (minutes < 1) return t('community.justNow');
+  if (minutes < 60) return t('community.minsAgo', { n: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}시간 전`;
+  if (hours < 24) return t('community.hoursAgo', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}일 전`;
-  return new Date(dateStr).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+  if (days < 7) return t('community.daysAgo', { n: days });
+  return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 export default function PostDetailPage() {
@@ -51,6 +55,7 @@ export default function PostDetailPage() {
 
   // 삭제 확인 모달 상태
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { t } = useT();
 
   // 게시글 조회
   useEffect(() => {
@@ -110,7 +115,7 @@ export default function PostDetailPage() {
           ? {
               ...prev,
               comment_count: prev.comment_count + 1,
-              comments: [...prev.comments, { ...newComment, authorNickname: user?.nickname ?? '나' }],
+              comments: [...prev.comments, { ...newComment, authorNickname: user?.nickname ?? t('home.me') }],
             }
           : prev,
       );
@@ -178,7 +183,7 @@ export default function PostDetailPage() {
           </svg>
         </button>
 
-        <h1 className="text-sm font-semibold text-white">게시글</h1>
+        <h1 className="text-sm font-semibold text-white">{t('community.postDetail')}</h1>
 
         {/* 본인 글: ⋯ 메뉴 */}
         {isAuthor ? (
@@ -204,7 +209,7 @@ export default function PostDetailPage() {
                   }}
                   className="w-full px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-700 text-left transition-colors"
                 >
-                  수정
+                  {t('common.edit')}
                 </button>
                 <div className="h-px bg-gray-700" />
                 <button
@@ -214,7 +219,7 @@ export default function PostDetailPage() {
                   }}
                   className="w-full px-4 py-2.5 text-sm text-red-400 hover:bg-gray-700 text-left transition-colors"
                 >
-                  삭제
+                  {t('common.delete')}
                 </button>
               </div>
             )}
@@ -237,10 +242,10 @@ export default function PostDetailPage() {
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-semibold text-white">{post.authorNickname}</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-800 text-gray-400">
-                {CATEGORY_LABEL[post.category]}
+                {t(CATEGORY_KEY[post.category])}
               </span>
             </div>
-            <span className="text-xs text-gray-500">{timeAgo(post.created_at)}</span>
+            <span className="text-xs text-gray-500">{timeAgo(post.created_at, t)}</span>
           </div>
         </div>
 
@@ -286,7 +291,7 @@ export default function PostDetailPage() {
       {/* 게시글 삭제 확인 모달 */}
       {showDeleteConfirm && (
         <ConfirmModal
-          message="게시글을 삭제하시겠어요?"
+          message={t('community.deletePostConfirm')}
           onConfirm={handleDeletePost}
           onCancel={() => setShowDeleteConfirm(false)}
         />

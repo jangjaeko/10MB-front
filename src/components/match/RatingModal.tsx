@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import type { Rating } from '@/types';
+import { useT } from '@/hooks/useT';
 
 interface RatingModalProps {
   endReason: 'timer' | 'partner_left' | 'self_left' | null;
@@ -21,14 +22,14 @@ export const RatingModal = ({
 }: RatingModalProps) => {
   const [selectedRating, setSelectedRating] = useState<Rating | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useT();
 
-  // 종료 사유별 메시지
   const endMessage =
     endReason === 'partner_left'
-      ? '상대방이 나갔습니다'
+      ? t('match.partnerLeft')
       : endReason === 'self_left'
-        ? '대화를 종료했습니다'
-        : '10분이 지났어요!';
+        ? t('match.selfLeft')
+        : t('match.timerEnd');
 
   // 평가 선택 핸들러
   const handleRate = async (rating: Rating) => {
@@ -60,7 +61,7 @@ export const RatingModal = ({
             </div>
           )}
           <h2 className="text-2xl font-bold text-white mb-1">{endMessage}</h2>
-          <p className="text-gray-400">즐거운 대화였나요?</p>
+          <p className="text-gray-400">{t('match.enjoyedQuestion')}</p>
         </div>
 
         {/* 평가 버튼 */}
@@ -78,7 +79,7 @@ export const RatingModal = ({
             <span className={`text-sm font-medium ${
               selectedRating === 'good' ? 'text-orange-400' : 'text-gray-300'
             }`}>
-              좋았어요
+              {t('match.rateGood')}
             </span>
           </button>
 
@@ -95,7 +96,7 @@ export const RatingModal = ({
             <span className={`text-sm font-medium ${
               selectedRating === 'neutral' ? 'text-gray-300' : 'text-gray-300'
             }`}>
-              보통이에요
+              {t('match.rateNeutral')}
             </span>
           </button>
         </div>
@@ -106,13 +107,13 @@ export const RatingModal = ({
             onClick={onRematch}
             className="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-semibold text-lg transition-colors"
           >
-            다시 매칭하기
+            {t('match.rematch')}
           </button>
           <button
             onClick={onGoHome}
             className="w-full py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium transition-colors"
           >
-            홈으로
+            {t('common.goHome')}
           </button>
         </div>
 
@@ -121,7 +122,7 @@ export const RatingModal = ({
           onClick={onReport}
           className="mt-6 text-sm text-gray-500 hover:text-red-400 transition-colors"
         >
-          상대방 신고하기
+          {t('match.reportPartner')}
         </button>
       </div>
     </div>

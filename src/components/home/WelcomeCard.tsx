@@ -3,12 +3,14 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/common/Button';
+import { useT } from '@/hooks/useT';
 
 interface WelcomeCardProps {
   nickname?: string;
 }
 
 export const WelcomeCard = ({ nickname }: WelcomeCardProps) => {
+  const { t } = useT();
   return (
     <div className="bg-gray-900 rounded-2xl p-6 text-white relative overflow-hidden">
       {/* 배경 장식 원 */}
@@ -17,13 +19,13 @@ export const WelcomeCard = ({ nickname }: WelcomeCardProps) => {
 
       <div className="relative">
         <p className="text-sm text-gray-400 mb-1">
-          {nickname ? `${nickname}님,` : '안녕하세요!'}
+          {nickname ? t('home.greeting', { nickname }) : t('home.greetingFallback')}
         </p>
         <h2 className="text-2xl font-bold mb-1">
-          잠깐 쉬어가세요 ☕
+          {t('home.tagline')}
         </h2>
         <p className="text-gray-400 text-sm mb-6">
-          10분만 낯선 누군가와 가볍게 대화해보세요.
+          {t('home.taglineBody')}
         </p>
 
         <Link href="/match">
@@ -31,7 +33,7 @@ export const WelcomeCard = ({ nickname }: WelcomeCardProps) => {
             size="lg"
             className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white"
           >
-            10분 대화 시작하기
+            {t('home.startButton')}
           </Button>
         </Link>
       </div>

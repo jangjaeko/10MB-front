@@ -1,6 +1,8 @@
 // 매칭 성공 화면 (상대방 닉네임 + 공통 관심사 표시)
 'use client';
 
+import { useT } from '@/hooks/useT';
+
 interface MatchFoundProps {
   partnerNickname: string;
   commonInterests: string[];
@@ -10,6 +12,7 @@ export const MatchFound = ({
   partnerNickname,
   commonInterests,
 }: MatchFoundProps) => {
+  const { t } = useT();
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
       {/* 성공 아이콘 */}
@@ -30,7 +33,7 @@ export const MatchFound = ({
       </div>
 
       <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        매칭 성공!
+        {t('match.matchSuccess')}
       </h2>
 
       {/* 상대방 정보 */}
@@ -47,7 +50,7 @@ export const MatchFound = ({
         {/* 공통 관심사 */}
         {commonInterests.length > 0 && (
           <div>
-            <p className="text-xs text-gray-400 mb-2">공통 관심사</p>
+            <p className="text-xs text-gray-400 mb-2">{t('match.commonInterests')}</p>
             <div className="flex flex-wrap justify-center gap-1.5">
               {commonInterests.map((interest) => (
                 <span
@@ -63,7 +66,7 @@ export const MatchFound = ({
       </div>
 
       <p className="text-sm text-gray-400 mt-6 animate-pulse">
-        잠시 후 음성 연결이 시작됩니다...
+        {t('match.connectingSoon')}
       </p>
     </div>
   );

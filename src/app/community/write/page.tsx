@@ -7,6 +7,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/lib/api';
 import { POST_CATEGORIES } from '@/types';
 import type { Post, PostCategory } from '@/types';
+import { useT } from '@/hooks/useT';
+import type { TranslationKey } from '@/lib/i18n';
+
+const CAT_LABEL_KEY: Record<PostCategory, TranslationKey> = {
+  free: 'community.catFree',
+  concern: 'community.catConcern',
+  humor: 'community.catHumor',
+  topic: 'community.catTopic',
+  review: 'community.catReview',
+};
 
 const MAX_TITLE = 100;
 const MAX_CONTENT = 500;
@@ -25,6 +35,7 @@ function WritePostContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useT();
 
   // 수정 모드: 기존 게시글 불러오기
   useEffect(() => {
@@ -76,7 +87,7 @@ function WritePostContent() {
       }
       router.push('/community');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '게시글 저장에 실패했습니다');
+      setError(err instanceof Error ? err.message : t('community.saveFailed'));
       setIsSubmitting(false);
     }
   };
@@ -99,10 +110,10 @@ function WritePostContent() {
           onClick={() => router.back()}
           className="text-sm text-gray-400 hover:text-white transition-colors"
         >
-          취소
+          {t('common.cancel')}
         </button>
         <h1 className="text-sm font-semibold text-white">
-          {isEditMode ? '글 수정' : '새 글 작성'}
+          {isEditMode ? t('community.editPost') : t('community.newPost')}
         </h1>
         <button
           onClick={handleSubmit}
@@ -114,8 +125,8 @@ function WritePostContent() {
           }`}
         >
           {isSubmitting
-            ? (isEditMode ? '수정 중...' : '게시 중...')
-            : (isEditMode ? '수정' : '등록')}
+            ? (isEditMode ? t('community.editing') : t('community.posting'))
+            : (isEditMode ? t('community.update') : t('community.register'))}
         </button>
       </div>
 
@@ -135,7 +146,7 @@ function WritePostContent() {
                     : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
               }`}
             >
-              {cat.label}
+              {t(CAT_LABEL_KEY[cat.value])}
             </button>
           ))}
         </div>
@@ -146,7 +157,7 @@ function WritePostContent() {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, MAX_TITLE))}
-            placeholder="제목"
+            placeholder={t('community.postTitlePlaceholder')}
             className="w-full bg-transparent text-white text-lg font-bold placeholder:text-gray-600 outline-none"
           />
           <div className="flex justify-end mt-1">
@@ -161,7 +172,7 @@ function WritePostContent() {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value.slice(0, MAX_CONTENT))}
-            placeholder="무슨 생각을 하고 있어요?"
+            placeholder={t('community.postContentPlaceholder')}
             rows={12}
             className="w-full bg-transparent text-gray-200 text-sm placeholder:text-gray-600 outline-none resize-none"
           />

@@ -7,19 +7,21 @@ import { PostCard } from '@/components/community/PostCard';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/lib/api';
 import type { Post, PostCategory, PostListResponse } from '@/types';
-
-const CATEGORIES: { value: PostCategory | 'all'; label: string }[] = [
-  { value: 'all', label: '전체' },
-  { value: 'free', label: '자유' },
-  { value: 'concern', label: '고민' },
-  { value: 'humor', label: '유머' },
-  { value: 'topic', label: '주제추천' },
-  { value: 'review', label: '대화후기' },
-];
+import { useT } from '@/hooks/useT';
 
 export default function CommunityPage() {
   const router = useRouter();
   const { isLoading, isAuthenticated } = useAuth();
+  const { t } = useT();
+
+  const CATEGORIES: { value: PostCategory | 'all'; label: string }[] = [
+    { value: 'all', label: t('community.allCategory') },
+    { value: 'free', label: t('community.catFree') },
+    { value: 'concern', label: t('community.catConcern') },
+    { value: 'humor', label: t('community.catHumor') },
+    { value: 'topic', label: t('community.catTopic') },
+    { value: 'review', label: t('community.catReview') },
+  ];
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [category, setCategory] = useState<PostCategory | 'all'>('all');
@@ -102,7 +104,7 @@ export default function CommunityPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
             </svg>
           </div>
-          <span className="text-sm text-gray-500">무슨 생각 하고 있어요?</span>
+          <span className="text-sm text-gray-500">{t('community.writePrompt')}</span>
         </div>
       </div>
 
@@ -131,8 +133,8 @@ export default function CommunityPage() {
       ) : posts.length === 0 ? (
         <div className="text-center py-20">
           <span className="text-4xl mb-3 block">📝</span>
-          <p className="text-gray-500 text-sm">아직 게시글이 없어요</p>
-          <p className="text-gray-600 text-xs mt-1">첫 번째 글을 작성해보세요!</p>
+          <p className="text-gray-500 text-sm">{t('community.noPostsTitle')}</p>
+          <p className="text-gray-600 text-xs mt-1">{t('community.noPostsBody')}</p>
         </div>
       ) : (
         <>
@@ -151,7 +153,7 @@ export default function CommunityPage() {
 
           {!hasMore && posts.length > 0 && (
             <p className="text-center text-gray-600 text-xs py-6">
-              모든 게시글을 불러왔어요
+              {t('community.allLoaded')}
             </p>
           )}
         </>

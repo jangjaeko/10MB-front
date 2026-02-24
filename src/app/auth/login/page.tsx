@@ -4,11 +4,13 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/common/Button';
+import { useT } from '@/hooks/useT';
 
 export default function LoginPage() {
   const { signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useT();
 
   // Google 로그인 버튼 클릭 핸들러
   const handleGoogleLogin = async () => {
@@ -17,7 +19,7 @@ export default function LoginPage() {
       setError(null);
       await signInWithGoogle();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google 로그인에 실패했습니다. 다시 시도해주세요.');
+      setError(err instanceof Error ? err.message : t('auth.loginFailed'));
       setIsLoading(false);
     }
   };
@@ -37,12 +39,12 @@ export default function LoginPage() {
         {/* 서비스 소개 */}
         <div className="text-center mb-12">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            쉬는 시간 10분,
+            {t('auth.tagline1')}
             <br />
-            새로운 대화를 시작하세요
+            {t('auth.tagline2')}
           </h2>
           <p className="text-gray-500 text-sm">
-            낯선 사람과 가볍게 음성으로 소통해보세요
+            {t('auth.tagline3')}
           </p>
         </div>
 
@@ -78,12 +80,12 @@ export default function LoginPage() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          Google로 시작하기
+          {t('auth.loginWithGoogle')}
         </Button>
 
         {/* 이용약관 안내 */}
         <p className="text-center text-xs text-gray-400 mt-6">
-          시작하면 서비스 이용약관 및 개인정보처리방침에 동의하게 됩니다.
+          {t('auth.terms')}
         </p>
       </div>
     </div>
