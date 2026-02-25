@@ -13,7 +13,12 @@
       "Bash(npm run start:dev:*)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: v2 대화방 기반 구축 \\(5탭 네비, Room 타입, useVoice room 모드\\)\n\n- 하단 네비 5탭 확장 \\(홈/커뮤니티/매칭/알림/마이페이지\\)\n- 커뮤니티, 알림 플레이스홀더 페이지\n- Room, RoomParticipant 타입 추가\n- useVoice에 room 모드 추가 \\(그룹 음성, 시간 제한 없음\\)\n- api.ts에 rooms API 메서드 추가\n- next.config.ts 프로덕션 보안 헤더\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npx vercel --prod)"
     ]
   }
 }
