@@ -201,6 +201,15 @@ export const ko: Translations = {
   errors: {
     reconnectFailed: '서버 연결이 끊겼습니다. 페이지를 새로고침해주세요.',
   },
+  rooms: {
+    smoking: '흡연실',
+    rooftop: '옥상',
+    cafe: '카페',
+    park: '공원',
+    walk: '산책',
+    game: '게임',
+    reading: '독서',
+  },
   interests: {
     '잡담': '잡담',
     '고민상담': '고민상담',

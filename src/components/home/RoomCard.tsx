@@ -10,7 +10,7 @@ interface RoomCardProps {
 }
 
 export const RoomCard = ({ room, onJoin }: RoomCardProps) => {
-  const { t } = useT();
+  const { t, tr } = useT();
   const isFull = room.current_participants >= room.max_participants;
 
   return (
@@ -27,7 +27,7 @@ export const RoomCard = ({ room, onJoin }: RoomCardProps) => {
       <div className="text-4xl mb-3">{room.icon}</div>
 
       {/* 방 이름 */}
-      <h3 className="text-white font-semibold text-sm mb-2">{room.name}</h3>
+      <h3 className="text-white font-semibold text-sm mb-2">{tr(room)}</h3>
 
       {/* 참여자 수 */}
       <div className="flex items-center justify-between">

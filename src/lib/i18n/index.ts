@@ -53,5 +53,14 @@ export const translateInterest = (lang: Lang, tag: string): string => {
   return (dict.interests as Record<string, string>)[tag] ?? tag;
 };
 
+// 대화방 이름 번역 (theme 기반, 번호 suffix 유지 e.g. "흡연실 2" → "Smoking Room 2")
+export const translateRoom = (lang: Lang, room: { name: string; theme: string }): string => {
+  const rooms = (translations[lang] as any).rooms as Record<string, string> | undefined;
+  const base = rooms?.[room.theme];
+  if (!base) return room.name;
+  const suffix = room.name.match(/ \d+$/)?.[0] ?? '';
+  return base + suffix;
+};
+
 export { en, ko };
 export type { Translations };

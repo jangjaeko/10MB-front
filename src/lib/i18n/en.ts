@@ -199,6 +199,15 @@ export const en = {
   errors: {
     reconnectFailed: 'Connection lost. Please refresh the page.',
   },
+  rooms: {
+    smoking: 'Smoking Room',
+    rooftop: 'Rooftop',
+    cafe: 'Café',
+    park: 'Park',
+    walk: 'Walk',
+    game: 'Gaming',
+    reading: 'Reading',
+  },
   interests: {
     '잡담': 'Chat',
     '고민상담': 'Advice',

@@ -2,7 +2,7 @@
 'use client';
 
 import { useLangStore } from '@/stores/useLangStore';
-import { translate, translateInterest, type TranslationKey, type Lang } from '@/lib/i18n';
+import { translate, translateInterest, translateRoom, type TranslationKey, type Lang } from '@/lib/i18n';
 
 export const useT = () => {
   const { lang, setLang } = useLangStore();
@@ -12,7 +12,9 @@ export const useT = () => {
 
   const ti = (tag: string): string => translateInterest(lang, tag);
 
-  return { t, ti, lang, setLang };
+  const tr = (room: { name: string; theme: string }): string => translateRoom(lang, room);
+
+  return { t, ti, tr, lang, setLang };
 };
 
 export type { Lang };

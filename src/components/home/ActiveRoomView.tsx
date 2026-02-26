@@ -44,7 +44,7 @@ export const ActiveRoomView = ({
   onToggleMic,
   onLeave,
 }: ActiveRoomViewProps) => {
-  const { t } = useT();
+  const { t, tr } = useT();
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -75,7 +75,7 @@ export const ActiveRoomView = ({
         <div className="flex items-center gap-3">
           <span className="text-2xl">{room.icon}</span>
           <div>
-            <h2 className="text-white font-bold text-lg">{room.name}</h2>
+            <h2 className="text-white font-bold text-lg">{tr(room)}</h2>
             <p className="text-gray-400 text-xs">
               {t('home.activeRoomParticipants', { n: participants.length })}
             </p>
