@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useNotificationStore } from '@/stores/useNotificationStore';
 import { connectSocket } from '@/lib/socket';
 import { api } from '@/lib/api';
+import { InstallBanner } from '@/components/common/InstallBanner';
 
 // 네비게이션을 숨길 경로 패턴
 const HIDE_NAV_PATHS = ['/auth', '/onboarding', '/community/write'];
@@ -65,6 +66,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
         {children}
       </div>
       {!shouldHideNav && <BottomNav />}
+      <InstallBanner />
     </>
   );
 };
